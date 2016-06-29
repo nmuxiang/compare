@@ -21,6 +21,11 @@ def sheetstodict(a):
            i=i+1
         b[key]=shts
     return b
+
+def readcelltodict(a):
+    for row in range(a.nrows):
+        
+
 try:
     readFile=tkinter.filedialog.askopenfilenames()
     b=tupletodict(readFile)
