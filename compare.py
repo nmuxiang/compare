@@ -2,6 +2,7 @@ import tkinter.filedialog
 import xlrd
 import sys
 import json
+import re
 
 #读取文件名
 def tupletodict(a):
@@ -39,7 +40,12 @@ def readcelltodict(a,d):
                 for col in range(a.ncols):
                     b[xlrd.cellname(row,col)]=a.cell(row,col).value
     return b
-        
+
+def convertstrtonumber(a):
+    b=a.split(':')
+    for i in b:
+        c=re.match("^\w[A-Z]*",i)
+        d=re.match("^\d[0-9]*",i)
 def readfilenosetting(a='n'):
     readFile=tkinter.filedialog.askopenfilenames()
     b=tupletodict(readFile)
