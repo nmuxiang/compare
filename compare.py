@@ -90,6 +90,16 @@ def readfilesetting(a='n'):
     readFile=tkinter.filedialog.askopenfilenames()
     b=tupletodict(readFile)
     c=sheetstodict(b,d)
+    d=compare(c)
+    print(d)
+
+def compare(a):
+    b=[]
+    for key,value in a.items():
+        b.append(set(value))
+    c=set(b[0]^b[1])
+            
+
 
 #主函数
 def main():
