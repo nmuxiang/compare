@@ -94,10 +94,20 @@ def readfilesetting(a='n'):
     print(d)
 
 def compare(a):
+    c={}    
     b=[]
     for key,value in a.items():
-        b.append(set(value))
-    c=set(b[0]^b[1])
+        c[key]=value
+        del a[key]
+        break
+    for item in c.items():
+        for item1 in item[1]:
+            for item2 in item[1]:
+        for key,value in a.items():
+            pass
+            
+    #c=set(b[0]^b[1])
+    #print(c)
             
 
 
