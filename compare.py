@@ -94,21 +94,26 @@ def readfilesetting(a='n'):
     print(d)
 
 def compare(a):
-    c={}    
-    b=[]
+    c=[]    
+    b={}
+    i=0
     for key,value in a.items():
-        c[key]=value
-        del a[key]
-        break
-    for item in c.items():
-        for item1 in item[1]:
-            for item2 in item[1]:
-        for key,value in a.items():
-            pass
-            
-    #c=set(b[0]^b[1])
-    #print(c)
-            
+        f={}
+        f[key]=value
+        if i==0:
+            b=f
+            i=1
+        else:
+            c.append(f)
+    e=b.values()
+    for i in e:
+        for key,value in c:
+                if item in value:
+                    pass
+                else:
+                    print("(%key)中没有(%item)表"(key,item))
+
+
 
 
 #主函数
