@@ -4,6 +4,7 @@ import sys
 import json
 import re
 
+
 #读取文件名
 def tupletodict(a):
     b={}
@@ -96,22 +97,32 @@ def readfilesetting(a='n'):
 def compare(a):
     c=[]    
     b={}
+    e=[]
+    g=[]
     i=0
     for key,value in a.items():
         f={}
         f[key]=value
         if i==0:
-            b=f
+            b=f.values()
+            for iter in b:
+                e=iter.keys()
+                e.fromkeys(e)
             i=1
         else:
-            c.append(f)
-    e=b.values().keys()
+            b=f.values()
+            for iter in b:
+                g=iter.keys()
+                g.fromkeys(g)
+            c.append(g)
+#    e=b[0].keys()
     for i in e:
-        for iter in c:
-                if i in iter.values():
-                    pass
-                else:
-                    print("(%s)中没有(%s)表"%(key,i))
+        for m in c:
+            if i in m:
+                del m[i]
+            else:
+                print("(%s)中没有(%s)表"%(key,i))
+        if 
 
 
 
