@@ -93,21 +93,21 @@ def readfilesetting(a='n'):
     d=compare(c)
     print(d)
 
-def compare(a):
-    c={}    
+def compare(a): 
     b=[]
-    for key,value in a.items():
-        c[key]=value
-        del a[key]
-        break
-    for item in c.items():
-        for item1 in item[1]:
-            for item2 in item[1]:
-        for key,value in a.items():
-            pass
-            
-    #c=set(b[0]^b[1])
-    #print(c)
+    c={}
+    i=0
+    for item in a.items():
+        d[item[0]]=item[1]
+        if i==[item[0]]=item[1]:
+            i=1
+            continue
+        w=cmp(c,d)
+        if e>0:
+            b.append(c)
+        else:
+            b.append(d)
+
             
 
 
