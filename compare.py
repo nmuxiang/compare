@@ -122,7 +122,8 @@ def compare(a):
                 del m[i]
             else:
                 print("(%s)中没有(%s)表"%(key,i))
-        if 
+    if c != None:
+
 
 
 
