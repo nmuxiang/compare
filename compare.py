@@ -102,21 +102,21 @@ def compare(a):
         f={}
         h={}
         if i==0:
-            for key in value:
-                h[key]=''    
+            for t in value:
+                h[t]=''    
             b[key]=h
             i=1
         else:
-             for key in value:
+             for t in value:
                 h[key]=''    
-            g[key]=h
-            c.append(g)
+                g[key]=h
+                c.append(g)
     for value in b.values():
         for iter in c:
                 if value in iter.values():
                     del iter.value
                     if iter.values()==None:
-                        del 
+                        pass
                 else:
                     print("(%s)中没有(%s)表"%(iter.key,value))
 
