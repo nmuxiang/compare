@@ -91,12 +91,14 @@ def readfilesetting(a='n'):
     b=tupletodict(readFile)
     c=sheetstodict(b,d)
     d=compare(c)
-
+    print(d)
 def compare(a):
     c={}
     b={}
     g={}
     i=0
+    str=''
+    strlist=[]
     for key,value in a.items():
         f={}
         h={}
@@ -118,8 +120,8 @@ def compare(a):
                         del itervalue[key]
                         break
                 else:
-                    str=iterkey.split('/',)[-1]
-                    print('%s中没有%s表'%(str,key))
+                    str=str+iterkey.split('/',)[-1]+key
+                    strlist.append(str)
     d={}
     for key,value in c.items():
         if len(value)!=0:
@@ -129,14 +131,14 @@ def compare(a):
         for key,value in d.items():
             for key1,value1 in a.items():
                 if key!=key1:
-                    str=''
-                    str="%文件中没有"%(key1)
-                    strlist=[]
-                    strlist.append(str)
+                    str=key1+"中没有"
                     for key2 in value.keys():
-                        strlist.append(key2+'表')
-                    str=','.join(strlist)
-                    return(str)
+                        str+=key2+'表,'
+                    if str[-1]==',':
+                        str=str[:-2]
+                    strlist.append(str)    
+    str='\n'.join(strlist)
+    return(str)
 
 
 
