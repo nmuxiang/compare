@@ -96,6 +96,7 @@ def compare(a):
     c={}
     b={}
     g={}
+    notin={}
     i=0
     str=''
     strlist=[]
@@ -112,7 +113,7 @@ def compare(a):
                 h[t]=''    
              c[key]=h
 
-    for value in b.values():
+    for bkey,value in b.items():
         for key in value.keys():
             for iterkey,itervalue in c.items():
                 if key in itervalue.keys():
@@ -120,13 +121,29 @@ def compare(a):
                         del itervalue[key]
                         break
                 else:
+                    no={}
+                    no[key]=""
                     str=str+iterkey.split('/',)[-1]+key
                     strlist.append(str)
+                    if bkey not in notin.keys():
+                        notin[bkey]=no
+                    else:
+                        if key not in notin[bkey]:
+                            nn=notin[bkey].copy()
+                            nn=nn.update(no)
+                            notin[bkey]=nn
     d={}
     for key,value in c.items():
         if len(value)!=0:
             d[key]=value
-
+            if key not in notin.keys():
+                notin[key] = value
+            else:
+                for key1 in value.keys():
+                    if key1 not in notin[key]:
+                        nn = notin[key].copy()
+                        nn = nn.update(value[key1])
+                        notin[key] = nn
     if len(d)!=0:
         for key,value in d.items():
             for key1,value1 in a.items():
@@ -136,7 +153,8 @@ def compare(a):
                         str+=key2+'表,'
                     if str[-1]==',':
                         str=str[:-2]
-                    strlist.append(str)    
+                    strlist.append(str)
+
     str='\n'.join(strlist)
     return(str)
 
