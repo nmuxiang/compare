@@ -119,11 +119,11 @@ def compare(a):
             del c[key]
             i=1
     
-    for bkey,bvalue in b.items():
-        for bvaluekey,bvaluevalue in bvalue():
-            for ckey,cvalue in c.items():
-                if bvaluekey in cvalue:
-                    for bvaluevaluekey,bvaluevaluevalue in bvaluevalue:
+    for bkey,bvalue in b.items():       #bkey文件名，bvalue表名字典
+        for bvaluekey,bvaluevalue in bvalue():      #bvaluekey表名，bvaluevalue单元格字典
+            for ckey,cvalue in c.items():       #ckey文件名，cvalue表名字典
+                if bvaluekey in cvalue:         
+                    for bvaluevaluekey,bvaluevaluevalue in bvaluevalue:     #bvaluevaluekey单元格名，bvaluevaluevalue单元格值
                         if cvalue[bvaluekey][bvaluevaluekey]==bvaluevalue:
                             pass
                         else:
