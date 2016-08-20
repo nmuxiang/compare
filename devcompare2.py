@@ -6,27 +6,34 @@ import re
 
 #读取文件名
 def tupletodict(a):
-    b={}
+    bb=[]
     for item in a:
+        b={}
         b[item]=''
-    return b
+        bb.append(b)
+    return bb
 
 #读取每个文件中的表名
 def sheetstodict(a,d):
-    b={}
-    for key,value in a.items():
-        wb=xlrd.open_workbook(key)
-        shts={}
-        if d:
+
+    aa=[]
+    for iter in a:
+        for key,value in iter.items():
+            b={}
+            wb=xlrd.open_workbook(key)
+            shts={}
+            if d:
+                for s in wb.sheets():
+                    c=readcelltodict(s,d)
+                    shts[s.name]=c
+                    b[key]=shts
             for s in wb.sheets():
-                c=readcelltodict(s,d)
+                c=readcelltodict(s)
                 shts[s.name]=c
-                b[key]=shts
-        for s in wb.sheets():
-            c=readcelltodict(s)
-            shts[s.name]=c
-        b[key]=shts
-    return b
+            b[key]=shts
+            aa.append(b)
+            break
+    return aa
 
 #不载入配置文件读取每个表中单元格的值和位置
 #def readcelltodict(a):
@@ -93,98 +100,56 @@ def readfilesetting(a='n'):
     d=compare(c)
     print(d)
 def compare(a):
-    c={}
-    b={}
     g={}
-    notin={}
-    i=0
+    notin=[]
     str=''
     strlist=[]
-##    for key,value in a.items():
-##        f={}
-##        h={}
-##        if i==0:
-##            for t in value:
-##                h[t]=''    
-##            b[key]=h
-##            i=1
-##        else:
-##             for t in value:
-##                h[t]=''    
-##             c[key]=h
-    for key,value in a.items():
-        if i==0:
-            b[key]=value
-            i=1
-        else:
-            c[key]=value
-    
-    for bkey,bvalue in b.items():       #bkey文件名，bvalue表名字典
-        for bvaluekey,bvaluevalue in bvalue.items():      #bvaluekey表名，bvaluevalue单元格字典
-            for ckey,cvalue in c.items():       #ckey文件名，cvalue表名字典
-                if bvaluekey in cvalue:         
-                    for bvaluevaluekey,bvaluevaluevalue in bvaluevalue:     #bvaluevaluekey单元格名，bvaluevaluevalue单元格值
-                        if cvalue[bvaluekey][bvaluevaluekey]==bvaluevaluevalue:
+    for i in range(0,(len(a)-1)):
+        b=a[i]
+        c=a[i+1]   
+        for bkey,bvalue in b.items():       #bkey文件名，bvalue表名字典
+            for bvaluekey,bvaluevalue in bvalue.items():      #bvaluekey表名，bvaluevalue单元格字典
+                for ckey,cvalue in c.items():       #ckey文件名，cvalue表名字典
+                    if bvaluekey in cvalue:
+                        if cvalue[bvaluekey]==bvalue[bvaluekey]:
                             pass
-                        else:
-                            nnn={}
-                            nn={}
-                            nnn[bvaluevaluekey]=cvalue[bvaluekey][bvaluevaluekey]
-                            nn[bvaluekey]=nnn
-                            notin[ckey]=nn
-                else:
-                    nn={}
-                    nn[bvaluekey]=''
-                    notin[ckey]=nn
+                        else:         
+                            for bvaluevaluekey,bvaluevaluevalue in bvaluevalue.items():     #bvaluevaluekey单元格名，bvaluevaluevalue单元格值
+                                for cvaluevaluekey,cvaluevaluevalue in cvalue[bvaluekey].items():
+                                    if bvaluevaluekey in cvalue[bvaluekey]:
+                                        if bvaluevaluevalue==cvalue[bvaluekey][bvaluevaluekey]:
+                                            pass
+                                        else:
+                                            str=bkey+'文件'+bvaluekey+'表'+cvaluevaluekey+'不等于'+ckey+'文件'+bvaluekey+'表'+cvaluevaluekey
+                                            notin.append(str)
+                                            #nn={}
+                                            #nnn={}
+                                            #nn[bvaluevaluekey]=cvalue[bvaluekey][bvaluevaluekey]
+                                            #nnn[bvaluekey]=nn
+                                            #notin[ckey]=nn
+                                    else:
+                                        str=ckey+'文件'+bvaluekey+'表中没有'+bvaluevaluekey
+                                        notin.append(str)
+                                        #nn={}
+                                        #nnn={}
+                                        #nn[bvaluevaluekey]=''
+                                        #nnn[bvaluekey]=nn
+                                        #notin[ckey]=nnn
+                                    if cvaluevaluekey not in bvaluevalue:
+                                        str=bkey+'文件'+bvaluekey+'表中没有'+cvaluevaluekey
+                                        notin.append(str)
+                                        #nn={}
+                                        #nnn={}
+                                        #nn[bvaluevaluekey]=''
+                                        #nnn[bvaluekey]=nn
+                                        #notin[ckey]=nnn
+                    else:
+                        str=ckey+'文件中没有'+bvaluekey+'表'
+                        notin.append(str)
+                        nn={}
+                        nn[bvaluekey]=''
+                        notin[ckey]=nn
     return notin
-                    
-##    
-##    for bkey,bvalue in b.items():
-##        for key in bvalue.keys():
-##            for iterkey,itervalue in c.items():
-##                if key in itervalue.keys():
-##                        del itervalue[key]
-##                        break
-##                else:
-##                    no={}
-##                    no[key]=""
-##                    str=str+iterkey.split('/',)[-1]+key
-##                    strlist.append(str)
-##                    if bkey not in notin.keys():
-##                        notin[bkey]=no
-##                    else:
-##                        nn=notin[bkey]
-##                        if key not in nn.keys():
-##                            mm=notin[bkey].copy()
-##                            nn=mm.update(no)
-##                            notin[bkey]=nn
-##    d={}
-##    for key,value in c.items():
-##        if len(value)!=0:
-##            d[key]=value
-##            if key not in notin.keys():
-##                notin[key] = value
-##            else:
-##                for key1 in value.keys():
-##                    if key1 not in notin[key]:
-##                        nn = notin[key].copy()
-##                        nn = nn.update(value[key1])
-##                        notin[key] = nn
-##    print(notin)
-##    if len(d)!=0:
-##        for key,value in d.items():
-##            for key1,value1 in a.items():
-##                if key!=key1:
-##                    str=key1+"中没有"
-##                    for key2 in value.keys():
-##                        str+=key2+'表,'
-##                    if str[-1]==',':
-##                        str=str[:-1]
-##                    strlist.append(str)
-##
-##    str='\n'.join(strlist)
-##    return(str)
-
 
 
 #主函数
