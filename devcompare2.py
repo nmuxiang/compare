@@ -111,72 +111,55 @@ def compare(a):
     for i in range(0,(len(a)-1)):
         b=a[i]
         c=a[i+1]
+        m=-2
         for bkey,bvalue in b.items():       #bkey文件名，bvalue表名字典
             for bvaluekey,bvaluevalue in bvalue.items():      #bvaluekey表名，bvaluevalue单元格字典
+                o=0     #b表名
                 for ckey,cvalue in c.items():       #ckey文件名，cvalue表名字典
-                    for cvaluekey,cvaluevalue in cvalue.items():
-                        aa=[]
-                        bb=[]
-                        nn={bkey:aa,ckey:bb}
-                        if bvaluekey in cvalue:
+                    if m==-2:
+                        m=len(cvalue)-1     #c表名
+                    aa=[]
+                    bb=[]
+                    nn={bkey:aa,ckey:bb}
+                    for cvaluekey,cvaluevalue in cvalue.items():                  
+                        if bvaluekey in cvalue and o==0:
                             if cvalue[bvaluekey]==bvalue[bvaluekey]:
+                                o=1     
                                 pass
                             else:
                                 for bvaluevaluekey,bvaluevaluevalue in bvaluevalue.items():     #bvaluevaluekey单元格名，bvaluevaluevalue单元格值
+                                    p=0     #b单元格
+                                    n=-2
                                     for cvaluevaluekey,cvaluevaluevalue in cvalue[bvaluekey].items():
-                                        if bvaluevaluekey in cvalue[bvaluekey]:
+                                        if n==-2:
+                                            n=len(cvaluevaluekey)-1     #c单元格
+                                        if bvaluevaluekey in cvalue[bvaluekey] and p==0:
                                             if bvaluevaluevalue==cvalue[bvaluekey][bvaluevaluekey]:
+                                                p=1
                                                 pass
                                             else:
-                                                #str=bkey+'文件'+bvaluekey+'表'+cvaluevaluekey+'不等于'+ckey+'文件'+bvaluekey+'表'+cvaluevaluekey
-                                                #notin[str]=''
                                                 nn[bkey].append(bvaluekey+'表'+cvaluevaluekey+'单元格不等于')
                                                 nn[ckey].append(bvaluekey+'表'+cvaluevaluekey+'单元格不等于')
-                                                #notin.append(nn)
-                                                #notin[m]=nn
-                                                #nnn={}
-                                                #nn[bvaluevaluekey]=cvalue[bvaluekey][bvaluevaluekey]
-                                                #nnn[bvaluekey]=nn
-                                                #notin[ckey]=nn
-                                        else:
-                                            #str=ckey+'文件'+bvaluekey+'表中没有'+bvaluevaluekey
-                                            #notin[str]=''
+                                                p=1
+
+                                        elif p==0:
                                             nn[ckey].append(bvaluekey+'表'+bvaluevaluekey+'单元格')
                                             nn[bkey].append('')
-                                            #notin.append(nn)
-                                            #notin[m]=nn
-                                            #nnn={}
-                                            #nn[bvaluevaluekey]=''
-                                            #nnn[bvaluekey]=nn
-                                            #notin[ckey]=nnn
-                                        if cvaluevaluekey not in bvaluevalue:
-                                            #str=bkey+'文件'+bvaluekey+'表中没有'+cvaluevaluekey
-                                            #notin[str]=''
+                                            p=1
+                                        if cvaluevaluekey not in bvaluevalue and n>=0:
                                             nn[bkey].append(bvaluekey+'表'+cvaluevaluekey+'单元格')
                                             nn[ckey].append('')
-                                            #notin.append(nn)
-                                            #notin[m]=nn
-                                            #nn={}
-                                            #nnn={}
-                                            #nn[bvaluevaluekey]=''
-                                            #nnn[bvaluekey]=nn
-                                            #notin[ckey]=nnn
-                        else:
-                            #str=ckey+'文件中没有'+bvaluekey+'表'
-                            #notin[str]=''
-                            #nn={bkey}
+                                        n=n-1
+                                    notin.append(nn)
+                        elif o==0:
                             nn[ckey].append(bvaluekey+'表')
                             nn[bkey].append('')
-                            #notin.append(nn)
-                        if cvaluekey not in bvalue:
-                            #str=bkey+'文件中没有'+cvaluekey+'表'
-                            #notin[str]=''
+                            o=1
+                        if cvaluekey not in bvalue and m>=0:
                             nn[bkey].append(cvaluekey+'表')
                             nn[ckey].append('')
-                            #notin.append(nn)
-                            #notin[m]=nn
-            notin.append(nn)
-                        #m+=1
+                        m=m-1
+                    notin.append(nn)
     return notin
 
 
