@@ -4,7 +4,7 @@ import sys
 import json
 import re
 import math
-
+import pdb
 #读取文件名
 def tupletodict(a):
     bb=[]
@@ -112,9 +112,11 @@ def compare(a):
         b=a[i]
         c=a[i+1]
         m=-2
+        pdb.set_trace()
         for bkey,bvalue in b.items():       #bkey文件名，bvalue表名字典
             for bvaluekey,bvaluevalue in bvalue.items():      #bvaluekey表名，bvaluevalue单元格字典
                 o=0     #b表名
+                yn=True
                 for ckey,cvalue in c.items():       #ckey文件名，cvalue表名字典
                     if m==-2:
                         m=len(cvalue)-1     #c表名
@@ -155,11 +157,13 @@ def compare(a):
                             nn[ckey].append(bvaluekey+'表')
                             nn[bkey].append('')
                             o=1
-                        if cvaluekey not in bvalue and m>=0:
+                        if cvaluekey not in bvalue and yn==True:
                             nn[bkey].append(cvaluekey+'表')
                             nn[ckey].append('')
                         m=m-1
-                    notin.append(nn)
+                        if m==-1:
+                            yn=False
+        notin.append(nn)
     return notin
 
 
