@@ -4,7 +4,7 @@ import sys
 import json
 import re
 import math
-import pdb
+#import pdb
 #读取文件名
 def tupletodict(a):
     bb=[]
@@ -111,35 +111,36 @@ def compare(a):
     for i in range(0,(len(a)-1)):
         b=a[i]
         c=a[i+1]
-        m=-2
-        pdb.set_trace()
+        m=0
+        
         for bkey,bvalue in b.items():       #bkey文件名，bvalue表名字典
-            for bvaluekey,bvaluevalue in bvalue.items():      #bvaluekey表名，bvaluevalue单元格字典
-                o=0     #b表名
+            for ckey,cvalue in c.items():       #ckey文件名，cvalue表名字典
+                #pdb.set_trace()
+                aa=[]
+                bb=[]
+                nn={bkey:aa,ckey:bb}
                 yn=True
-                for ckey,cvalue in c.items():       #ckey文件名，cvalue表名字典
-                    if m==-2:
-                        m=len(cvalue)-1     #c表名
-                    aa=[]
-                    bb=[]
-                    nn={bkey:aa,ckey:bb}
+                m=len(cvalue)-1
+                cellyn=True
+                for bvaluekey,bvaluevalue in bvalue.items():      #bvaluekey表名，bvaluevalue单元格字典
+                    o=0
                     for cvaluekey,cvaluevalue in cvalue.items():                  
                         if bvaluekey in cvalue and o==0:
+                            n=len(cvaluevalue)-1     #c单元格
                             if cvalue[bvaluekey]==bvalue[bvaluekey]:
                                 o=1     
                                 pass
                             else:
                                 for bvaluevaluekey,bvaluevaluevalue in bvaluevalue.items():     #bvaluevaluekey单元格名，bvaluevaluevalue单元格值
                                     p=0     #b单元格
-                                    n=-2
+                                    n=0
                                     for cvaluevaluekey,cvaluevaluevalue in cvalue[bvaluekey].items():
-                                        if n==-2:
-                                            n=len(cvaluevaluekey)-1     #c单元格
                                         if bvaluevaluekey in cvalue[bvaluekey] and p==0:
                                             if bvaluevaluevalue==cvalue[bvaluekey][bvaluevaluekey]:
                                                 p=1
                                                 pass
-                                            else:
+                                            elif p==1:
+                                                
                                                 nn[bkey].append(bvaluekey+'表'+cvaluevaluekey+'单元格不等于')
                                                 nn[ckey].append(bvaluekey+'表'+cvaluevaluekey+'单元格不等于')
                                                 p=1
@@ -148,11 +149,12 @@ def compare(a):
                                             nn[ckey].append(bvaluekey+'表'+bvaluevaluekey+'单元格')
                                             nn[bkey].append('')
                                             p=1
-                                        if cvaluevaluekey not in bvaluevalue and n>=0:
+                                        if cvaluevaluekey not in bvaluevalue and cellyn==True:
                                             nn[bkey].append(bvaluekey+'表'+cvaluevaluekey+'单元格')
                                             nn[ckey].append('')
                                         n=n-1
-                                    notin.append(nn)
+                                        if n==-1:
+                                            cellyn=False
                         elif o==0:
                             nn[ckey].append(bvaluekey+'表')
                             nn[bkey].append('')
