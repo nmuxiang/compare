@@ -4,7 +4,7 @@ import sys
 import json
 import re
 import math
-#import pdb
+import pdb
 #读取文件名
 def tupletodict(a):
     bb=[]
@@ -16,7 +16,6 @@ def tupletodict(a):
 
 #读取每个文件中的表名
 def sheetstodict(a,d):
-
     aa=[]
     for iter in a:
         for key,value in iter.items():
@@ -99,8 +98,9 @@ def readfilesetting(a='n'):
     b=tupletodict(readFile)
     c=sheetstodict(b,d)
     d=compare(c)
-    for key in d:
-        print(key)
+    for item in d:
+        print(item)
+
 def compare(a):
     g={}
     notin=[]
@@ -115,13 +115,13 @@ def compare(a):
         
         for bkey,bvalue in b.items():       #bkey文件名，bvalue表名字典
             for ckey,cvalue in c.items():       #ckey文件名，cvalue表名字典
-                #pdb.set_trace()
+                pdb.set_trace()
                 aa=[]
                 bb=[]
                 nn={bkey:aa,ckey:bb}
                 yn=True
                 m=len(cvalue)-1
-                cellyn=True
+                
                 for bvaluekey,bvaluevalue in bvalue.items():      #bvaluekey表名，bvaluevalue单元格字典
                     o=0
                     for cvaluekey,cvaluevalue in cvalue.items():                  
@@ -134,6 +134,7 @@ def compare(a):
                                 for bvaluevaluekey,bvaluevaluevalue in bvaluevalue.items():     #bvaluevaluekey单元格名，bvaluevaluevalue单元格值
                                     p=0     #b单元格
                                     n=0
+                                    cellyn=True
                                     for cvaluevaluekey,cvaluevaluevalue in cvalue[bvaluekey].items():
                                         if bvaluevaluekey in cvalue[bvaluekey] and p==0:
                                             if bvaluevaluevalue==cvalue[bvaluekey][bvaluevaluekey]:
