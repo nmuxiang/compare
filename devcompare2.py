@@ -4,7 +4,7 @@ import sys
 import json
 import re
 import math
-import pdb
+#import pdb
 #读取文件名
 def tupletodict(a):
     bb=[]
@@ -112,29 +112,27 @@ def compare(a):
         b=a[i]
         c=a[i+1]
         m=0
-        
+        yn=True
         for bkey,bvalue in b.items():       #bkey文件名，bvalue表名字典
             for ckey,cvalue in c.items():       #ckey文件名，cvalue表名字典
-                pdb.set_trace()
+                #pdb.set_trace()
                 aa=[]
                 bb=[]
                 nn={bkey:aa,ckey:bb}
-                yn=True
-                m=len(cvalue)-1
-                
+                m=len(cvalue)              
                 for bvaluekey,bvaluevalue in bvalue.items():      #bvaluekey表名，bvaluevalue单元格字典
                     o=0
-                    for cvaluekey,cvaluevalue in cvalue.items():                  
+                    cellyn=True
+                    for cvaluekey,cvaluevalue in cvalue.items():      
                         if bvaluekey in cvalue and o==0:
-                            n=len(cvaluevalue)-1     #c单元格
+                                 #c单元格
                             if cvalue[bvaluekey]==bvalue[bvaluekey]:
                                 o=1     
                                 pass
                             else:
+                                n=len(cvalue[bvaluekey])
                                 for bvaluevaluekey,bvaluevaluevalue in bvaluevalue.items():     #bvaluevaluekey单元格名，bvaluevaluevalue单元格值
                                     p=0     #b单元格
-                                    n=0
-                                    cellyn=True
                                     for cvaluevaluekey,cvaluevaluevalue in cvalue[bvaluekey].items():
                                         if bvaluevaluekey in cvalue[bvaluekey] and p==0:
                                             if bvaluevaluevalue==cvalue[bvaluekey][bvaluevaluekey]:
@@ -150,22 +148,27 @@ def compare(a):
                                             nn[ckey].append(bvaluekey+'表'+bvaluevaluekey+'单元格')
                                             nn[bkey].append('')
                                             p=1
-                                        if cvaluevaluekey not in bvaluevalue and cellyn==True:
-                                            nn[bkey].append(bvaluekey+'表'+cvaluevaluekey+'单元格')
-                                            nn[ckey].append('')
-                                        n=n-1
-                                        if n==-1:
-                                            cellyn=False
+                                        if cellyn==True:
+                                            n=n-1
+                                            if cvaluevaluekey not in bvaluevalue and cellyn==True:
+                                                nn[bkey].append(bvaluekey+'表'+cvaluevaluekey+'单元格')
+                                                nn[ckey].append('')
+                                            if n==0:
+                                                cellyn=False
+                                                break
                         elif o==0:
                             nn[ckey].append(bvaluekey+'表')
                             nn[bkey].append('')
                             o=1
-                        if cvaluekey not in bvalue and yn==True:
-                            nn[bkey].append(cvaluekey+'表')
-                            nn[ckey].append('')
-                        m=m-1
-                        if m==-1:
-                            yn=False
+                        if yn==True:
+                            m=m-1
+                            if cvaluekey not in bvalue and yn==True:
+                                nn[bkey].append(cvaluekey+'表')
+                                nn[ckey].append('')
+                            if m==0:
+                                yn=False
+                                break
+                        
         notin.append(nn)
     return notin
 
