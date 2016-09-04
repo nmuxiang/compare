@@ -17,6 +17,7 @@ def tupletodict(a):
 #读取每个文件中的表名
 def sheetstodict(a,d):
     aa=[]
+    bb=[]
     for iter in a:
         for key,value in iter.items():
             b={}
@@ -33,7 +34,12 @@ def sheetstodict(a,d):
             b[key]=shts
             aa.append(b)
             break
-    return aa
+    file={}
+    for iter in aa:
+        for key,value in iter.items():
+            for key1,value1 in value.items():
+                file=dict.fromkeys(value1,**file[key1])
+    return aa   
 
 #不载入配置文件读取每个表中单元格的值和位置
 #def readcelltodict(a):
@@ -98,34 +104,59 @@ def readfilesetting(a='n'):
     b=tupletodict(readFile)
     c=sheetstodict(b,d)
     d=compare(c)
+    output(d)
+def output(d):
+    cc=[]
     for item in d:
-        print(item)
-
+        ee=0        
+        for dkey,dvalue in item.items():
+            if ee==0:
+                aa=len(dvalue)+1
+                bb=['']*aa
+                bb[0]=dkey
+                for a in range(1,aa-1):
+                    bb[a]=dvalue[a]
+            else:
+                bb[0]=bb[0]+','+dkey
+                for a in range(1,aa-1):
+                    bb[a]=bb[a]+','+dvalue[a]
+            ee+=1
+        cc.append(bb)
+    for iter in cc:
+        for iter1 in iter:
+            print(iter1)
 def compare(a):
     g={}
     notin=[]
     str=''
     strlist=[]
-    #j=math.factorial(len(a))
-    #m=0
     for i in range(0,(len(a)-1)):
         b=a[i]
-        c=a[i+1]
-        m=0
-        yn=True
-        for bkey,bvalue in b.items():       #bkey文件名，bvalue表名字典
-            for ckey,cvalue in c.items():       #ckey文件名，cvalue表名字典
-                #pdb.set_trace()
-                aa=[]
-                bb=[]
-                nn={bkey:aa,ckey:bb}
-                m=len(cvalue)              
-                for bvaluekey,bvaluevalue in bvalue.items():      #bvaluekey表名，bvaluevalue单元格字典
-                    o=0
-                    cellyn=True
-                    for cvaluekey,cvaluevalue in cvalue.items():      
+        for ii in range(i+1,len(a)):
+            c=a[ii]
+            m=0
+            yn=True
+            for bkey,bvalue in b.items():       #bkey文件名，bvalue表名字典
+                for ckey,cvalue in c.items():       #ckey文件名，cvalue表名字典
+                    #pdb.set_trace()
+                    aa=[]
+                    bb=[]
+                    nn={bkey:aa,ckey:bb}
+                    m=len(cvalue)              
+                    for bvaluekey,bvaluevalue in bvalue.items():      #bvaluekey表名，bvaluevalue单元格字典
+                        o=0
+                        cellyn=True
+                        if yn==True:
+                            for cvaluekey,cvaluevalue in cvalue.items():
+                                m=m-1
+                                if cvaluekey not in bvalue and yn==True:
+                                    nn[bkey].append(cvaluekey+'表')
+                                    nn[ckey].append('')
+                                if m==0:
+                                    yn=False
+                                    break  
                         if bvaluekey in cvalue and o==0:
-                                 #c单元格
+                                    #c单元格
                             if cvalue[bvaluekey]==bvalue[bvaluekey]:
                                 o=1     
                                 pass
@@ -133,43 +164,35 @@ def compare(a):
                                 n=len(cvalue[bvaluekey])
                                 for bvaluevaluekey,bvaluevaluevalue in bvaluevalue.items():     #bvaluevaluekey单元格名，bvaluevaluevalue单元格值
                                     p=0     #b单元格
-                                    for cvaluevaluekey,cvaluevaluevalue in cvalue[bvaluekey].items():
-                                        if bvaluevaluekey in cvalue[bvaluekey] and p==0:
-                                            if bvaluevaluevalue==cvalue[bvaluekey][bvaluevaluekey]:
-                                                p=1
-                                                pass
-                                            elif p==1:
-                                                
-                                                nn[bkey].append(bvaluekey+'表'+cvaluevaluekey+'单元格不等于')
-                                                nn[ckey].append(bvaluekey+'表'+cvaluevaluekey+'单元格不等于')
-                                                p=1
-
-                                        elif p==0:
-                                            nn[ckey].append(bvaluekey+'表'+bvaluevaluekey+'单元格')
-                                            nn[bkey].append('')
-                                            p=1
-                                        if cellyn==True:
+                                    if cellyn==True:
+                                        for cvaluevaluekey,cvaluevaluevalue in cvalue[bvaluekey].items():
                                             n=n-1
-                                            if cvaluevaluekey not in bvaluevalue and cellyn==True:
+                                            if cvaluevaluekey not in bvaluevalue and cvaluevaluevalue!='' and cellyn==True:
                                                 nn[bkey].append(bvaluekey+'表'+cvaluevaluekey+'单元格')
                                                 nn[ckey].append('')
                                             if n==0:
                                                 cellyn=False
                                                 break
+                                    if bvaluevaluekey in cvalue[bvaluekey] and p==0:
+                                        if bvaluevaluevalue==cvalue[bvaluekey][bvaluevaluekey]:
+                                            p=1
+                                            pass
+                                        elif p==0:
+                                            nn[bkey].append(bvaluekey+'表'+bvaluevaluekey+'单元格不等于')
+                                            nn[ckey].append(bvaluekey+'表'+bvaluevaluekey+'单元格不等于')
+                                            p=1
+                                    elif p==0 and bvaluevaluevalue!='':
+                                        nn[ckey].append(bvaluekey+'表'+bvaluevaluekey+'单元格')
+                                        nn[bkey].append('')
+                                        p=1
                         elif o==0:
                             nn[ckey].append(bvaluekey+'表')
                             nn[bkey].append('')
                             o=1
-                        if yn==True:
-                            m=m-1
-                            if cvaluekey not in bvalue and yn==True:
-                                nn[bkey].append(cvaluekey+'表')
-                                nn[ckey].append('')
-                            if m==0:
-                                yn=False
-                                break
+
+
                         
-        notin.append(nn)
+            notin.append(nn)
     return notin
 
 
