@@ -4,7 +4,7 @@ import sys
 import json
 import re
 import math
-#import pdb
+import pdb
 #读取文件名
 def tupletodict(a):
     bb=[]
@@ -17,7 +17,8 @@ def tupletodict(a):
 #读取每个文件中的表名
 def sheetstodict(a,d):
     aa=[]
-    bb=[]
+    file={}
+    pdb.set_trace()
     for iter in a:
         for key,value in iter.items():
             b={}
@@ -31,14 +32,26 @@ def sheetstodict(a,d):
             for s in wb.sheets():
                 c=readcelltodict(s)
                 shts[s.name]=c
+                dd=c.keys()
+                try:
+                    cc=file[s.name].keys()
+                except KeyError:
+                    file[s.name]=dict.fromkeys(dd)
+                else:
+                    ll=list(set(dd).union(set(cc)))
+                    file[s.name]=dict.fromkeys(ll)
             b[key]=shts
             aa.append(b)
             break
-    file={}
+    
     for iter in aa:
         for key,value in iter.items():
             for key1,value1 in value.items():
-                file=dict.fromkeys(value1,**file[key1])
+                for key2,value2 in file[key1].items():
+                    if key2 in value1:
+                        pass
+                    else:
+                        value1[key2]=''
     return aa   
 
 #不载入配置文件读取每个表中单元格的值和位置
