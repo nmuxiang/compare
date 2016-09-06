@@ -6,6 +6,7 @@ import re
 import math
 import pdb
 #读取文件名
+file={}
 def tupletodict(a):
     bb=[]
     for item in a:
@@ -17,8 +18,7 @@ def tupletodict(a):
 #读取每个文件中的表名
 def sheetstodict(a,d):
     aa=[]
-    file={}
-    pdb.set_trace()
+    #pdb.set_trace()
     for iter in a:
         for key,value in iter.items():
             b={}
@@ -42,7 +42,7 @@ def sheetstodict(a,d):
                     file[s.name]=dict.fromkeys(ll)
             b[key]=shts
             aa.append(b)
-    pdb.set_trace()
+    #pdb.set_trace()
     for iter in aa:
         for key,value in iter.items():
             for key1,value1 in value.items():
@@ -119,6 +119,7 @@ def readfilesetting(a='n'):
     output(d)
 def output(d):
     cc=[]
+    #pdb.set_trace()
     for item in d:
         ee=0        
         for dkey,dvalue in item.items():
@@ -126,12 +127,12 @@ def output(d):
                 aa=len(dvalue)+1
                 bb=['']*aa
                 bb[0]=dkey
-                for a in range(1,aa-1):
-                    bb[a]=dvalue[a]
+                for a in range(0,aa-1):
+                    bb[a+1]=dvalue[a]
             else:
                 bb[0]=bb[0]+','+dkey
-                for a in range(1,aa-1):
-                    bb[a]=bb[a]+','+dvalue[a]
+                for a in range(0,aa-1):
+                    bb[a+1]=bb[a+1]+','+dvalue[a]
             ee+=1
         cc.append(bb)
     for iter in cc:
@@ -142,7 +143,7 @@ def compare(a):
     notin=[]
     str=''
     strlist=[]
-    pdb.set_trace()
+    #pdb.set_trace()
     for i in range(0,(len(a)-1)):
         b=a[i]
         for ii in range(i+1,len(a)):
@@ -174,18 +175,18 @@ def compare(a):
                                 o=1     
                                 pass
                             else:
-                                n=len(cvalue[bvaluekey])
+##                                n=len(cvalue[bvaluekey])
                                 for bvaluevaluekey,bvaluevaluevalue in bvaluevalue.items():     #bvaluevaluekey单元格名，bvaluevaluevalue单元格值
                                     p=0     #b单元格
-                                    if cellyn==True:
-                                        for cvaluevaluekey,cvaluevaluevalue in cvalue[bvaluekey].items():
-                                            n=n-1
-                                            if cvaluevaluekey not in bvaluevalue and cvaluevaluevalue!='' and cellyn==True:
-                                                nn[bkey].append(bvaluekey+'表'+cvaluevaluekey+'单元格')
-                                                nn[ckey].append('')
-                                            if n==0:
-                                                cellyn=False
-                                                break
+##                                    if cellyn==True:
+##                                        for cvaluevaluekey,cvaluevaluevalue in cvalue[bvaluekey].items():
+##                                            n=n-1
+##                                            if cvaluevaluekey not in bvaluevalue and cvaluevaluevalue!='' and cellyn==True:
+##                                                nn[bkey].append(bvaluekey+'表'+cvaluevaluekey+'单元格')
+##                                                nn[ckey].append('')
+##                                            if n==0:
+##                                                cellyn=False
+##                                                break
                                     if bvaluevaluekey in cvalue[bvaluekey] and p==0:
                                         if bvaluevaluevalue==cvalue[bvaluekey][bvaluevaluekey]:
                                             p=1
@@ -202,6 +203,7 @@ def compare(a):
                             nn[ckey].append(bvaluekey+'表')
                             nn[bkey].append('')
                             o=1
+            #pdb.set_trace()                
             notin.append(nn)
     return notin
 
