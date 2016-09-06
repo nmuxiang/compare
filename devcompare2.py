@@ -42,8 +42,7 @@ def sheetstodict(a,d):
                     file[s.name]=dict.fromkeys(ll)
             b[key]=shts
             aa.append(b)
-            break
-    
+    pdb.set_trace()
     for iter in aa:
         for key,value in iter.items():
             for key1,value1 in value.items():
@@ -143,6 +142,7 @@ def compare(a):
     notin=[]
     str=''
     strlist=[]
+    pdb.set_trace()
     for i in range(0,(len(a)-1)):
         b=a[i]
         for ii in range(i+1,len(a)):
@@ -202,9 +202,6 @@ def compare(a):
                             nn[ckey].append(bvaluekey+'表')
                             nn[bkey].append('')
                             o=1
-
-
-                        
             notin.append(nn)
     return notin
 
@@ -224,7 +221,5 @@ e to exit ''')
                     sys.exit()
         except ValueError:
             print('Please enter y or n or e')
-
-
 main()
 
