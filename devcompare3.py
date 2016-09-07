@@ -4,7 +4,7 @@ import sys
 import json
 import re
 import math
-import pdb
+#import pdb
 #读取文件名
 file={}
 def tupletodict(a):
@@ -140,36 +140,40 @@ def output(d):
             print(iter1)
 def compare(a):
     notin=[]
-    strlist=[]
-    filename={}
-    filename['File Name']=''
+    filename=[]
+    filename.append('File Name')
     ii=0
     yn=True
-    pdb.set_trace()
+    #pdb.set_trace()
     for filekey,filevalue in file.items():          #filekey表名，filevalue单元格字典
-        for filevaluekey in filevalue.keys():       #filevaluekey单元格名
-            diff=[]
-            diff.append(filekey)
-            for i in a:
-                ii=ii+1
-                for key,value in i.items():       #key文件名，value表名字典
-                    if yn==True:
-                        filename[key]=''
-                    if filekey in value:
-                        if filevaluekey in value[filekey]:
-                            if value[filekey][filevaluekey]=='':
-                                diff.append('-')
-                            else:
-                                diff.append(value[filekey][filevaluekey])
+        diff=[]
+        diff.append(filekey)
+        if len(filevalue)!=0:
+            for filevaluekey in filevalue.keys():       #filevaluekey单元格名
+                for i in a:
+                    ii=ii+1
+                    for key,value in i.items():       #key文件名，value表名字典
+                        if yn==True:                    #产生表名行
+                            filename.append(key)
+                        if filekey in value:
+                           diff.append(filevaluekey+'单元格'+str(value[filekey][filevaluekey]))
+                           break
                         else:
-                            diff.append('-')
-                    else:
-                        diff.append('没有'+filekey)
-                    if ii==len(a):
-                        yn=False
-                        notin.append(filename)
+                            diff.append('没有'+filekey)
+                        if ii==len(a):
+                            yn=False
+                            notin.append(filename)
+                        break
+        else:
+            diff.append('空表')
+        for s in range(1,len(diff)-1):
+            for r in range(s+1,len(diff)):
+                if diff[s]!=diff[r]:
+                    notin.append(diff)
                     break
-            notin.append(diff)
+                else:
+                    continue
+            break
     return notin
 
 
