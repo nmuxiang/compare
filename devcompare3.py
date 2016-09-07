@@ -36,7 +36,7 @@ def sheetstodict(a,d):
                 try:
                     cc=file[s.name].keys()
                 except KeyError:
-                    file[s.name]=dict.fromkeys(dd)
+                    file[s.name]=dict.fromkeys(dd,'')
                 else:
                     ll=list(set(dd).union(set(cc)))
                     file[s.name]=dict.fromkeys(ll)
@@ -141,54 +141,35 @@ def output(d):
 def compare(a):
     notin=[]
     strlist=[]
+    filename={}
+    filename['File Name']=''
+    ii=0
+    yn=True
+    pdb.set_trace()
     for filekey,filevalue in file.items():          #filekey表名，filevalue单元格字典
         for filevaluekey in filevalue.keys():       #filevaluekey单元格名
+            diff=[]
+            diff.append(filekey)
             for i in a:
-                filename=[]
-                diff=[]
+                ii=ii+1
                 for key,value in i.items():       #key文件名，value表名字典
-                    filename.append(key)
-                    if value[filekey][filevaluekey]=='':
-                        diff.append('-')
+                    if yn==True:
+                        filename[key]=''
+                    if filekey in value:
+                        if filevaluekey in value[filekey]:
+                            if value[filekey][filevaluekey]=='':
+                                diff.append('-')
+                            else:
+                                diff.append(value[filekey][filevaluekey])
+                        else:
+                            diff.append('-')
                     else:
-                        diff.append(value[filekey][filevaluekey])
-                        
-                            if bvaluekey in cvalue and o==0:
-                                        #c单元格
-                                if cvalue[bvaluekey]==bvalue[bvaluekey]:
-                                    o=1     
-                                    pass
-                                else:
-    ##                                n=len(cvalue[bvaluekey])
-                                    for bvaluevaluekey,bvaluevaluevalue in bvaluevalue.items():     #bvaluevaluekey单元格名，bvaluevaluevalue单元格值
-                                        p=0     #b单元格
-    ##                                    if cellyn==True:
-    ##                                        for cvaluevaluekey,cvaluevaluevalue in cvalue[bvaluekey].items():
-    ##                                            n=n-1
-    ##                                            if cvaluevaluekey not in bvaluevalue and cvaluevaluevalue!='' and cellyn==True:
-    ##                                                nn[bkey].append(bvaluekey+'表'+cvaluevaluekey+'单元格')
-    ##                                                nn[ckey].append('')
-    ##                                            if n==0:
-    ##                                                cellyn=False
-    ##                                                break
-                                        if bvaluevaluekey in cvalue[bvaluekey] and p==0:
-                                            if bvaluevaluevalue==cvalue[bvaluekey][bvaluevaluekey]:
-                                                p=1
-                                                pass
-                                            elif p==0:
-                                                nn[bkey].append(bvaluekey+'表'+bvaluevaluekey+'单元格不等于')
-                                                nn[ckey].append(bvaluekey+'表'+bvaluevaluekey+'单元格不等于')
-                                                p=1
-                                        elif p==0 and bvaluevaluevalue!='':
-                                            nn[ckey].append(bvaluekey+'表'+bvaluevaluekey+'单元格')
-                                            nn[bkey].append('')
-                                            p=1
-                            elif o==0:
-                                nn[ckey].append(bvaluekey+'表')
-                                nn[bkey].append('')
-                                o=1
-            #pdb.set_trace()                
-            notin.append(nn)
+                        diff.append('没有'+filekey)
+                    if ii==len(a):
+                        yn=False
+                        notin.append(filename)
+                    break
+            notin.append(diff)
     return notin
 
 
@@ -208,4 +189,3 @@ e to exit ''')
         except ValueError:
             print('Please enter y or n or e')
 main()
-
