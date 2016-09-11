@@ -150,30 +150,36 @@ def compare(a):
         diff.append(filekey)
         if len(filevalue)!=0:
             for filevaluekey in filevalue.keys():       #filevaluekey单元格名
+                cell=[]
                 for i in a:
                     ii=ii+1
                     for key,value in i.items():       #key文件名，value表名字典
                         if yn==True:                    #产生表名行
                             filename.append(key)
                         if filekey in value:
-                           diff.append(filevaluekey+'单元格'+str(value[filekey][filevaluekey]))
+                           cell.append(filevaluekey+'单元格'+str(value[filekey][filevaluekey]))
                            break
                         else:
-                            diff.append('没有'+filekey)
-                        if ii==len(a):
-                            yn=False
+                            cell.append('没有'+filekey)
+                    if ii==len(a):
+                        yn=False
+                        for s in range(0,len(cell)-1):
+                            for r in range(s+1,len(cell)):
+                                if cell[s]!=cell[r]:
+                                    diff.append(cell)
+                                    notin.append(diff)
+                                    break
+                                else:
+                                    if s==len(cell)-1:
+                                        break
+                                    continue
+                            break
                             notin.append(filename)
                         break
         else:
-            diff.append('空表')
-        for s in range(1,len(diff)-1):
-            for r in range(s+1,len(diff)):
-                if diff[s]!=diff[r]:
-                    notin.append(diff)
-                    break
-                else:
-                    continue
-            break
+            #diff.append('空表')
+            pass
+
     return notin
 
 
