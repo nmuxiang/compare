@@ -142,37 +142,41 @@ def compare(a):
     notin=[]
     filename=[]
     filename.append('File Name')
-    ii=0
     yn=True
     #pdb.set_trace()
     for filekey,filevalue in file.items():          #filekey表名，filevalue单元格字典
-        diff=[]
+        diff=[]                             #记录表之间的不同
         diff.append(filekey)
         if len(filevalue)!=0:
-            for filevaluekey in filevalue.keys():       #filevaluekey单元格名
-                cell=[]
+            cell=[]                         #记录每个表中所有单元格的不同
+            for filevaluekey in filevalue.keys():       #filevaluekey单元格名                
+                temp=[]                     #每个单元格的不同
+                ii=0
                 for i in a:
                     ii=ii+1
                     for key,value in i.items():       #key文件名，value表名字典
                         if yn==True:                    #产生表名行
                             filename.append(key)
                         if filekey in value:
-                           cell.append(filevaluekey+'单元格'+str(value[filekey][filevaluekey]))
+                           temp.append(filevaluekey+'单元格'+str(value[filekey][filevaluekey]))
                            break
                         else:
-                            cell.append('没有'+filekey)
+                            temp.append('没有'+filekey)
                     if ii==len(a):
                         yn=False
-                        for s in range(0,len(cell)-1):
-                            for r in range(s+1,len(cell)):
-                                if cell[s]!=cell[r]:
-                                    diff.append(cell)
-                                    notin.append(diff)
+                        for s in range(0,len(temp)-1):
+                            for r in range(s+1,len(temp)):
+                                if temp[s]!=temp[r]:
+                                    for aa in range(0,len(temp)):
+                                        if cell:
+                                            cell[aa]=cell[aa]+','+temp[aa]
+                                        else:
+                                            cell=temp
+                                            break
                                     break
                                 else:
-                                    if s==len(cell)-1:
+                                    if s==len(temp)-1 and r==len(temp):
                                         break
-                                    continue
                             break
                             notin.append(filename)
                         break
