@@ -118,26 +118,12 @@ def readfilesetting(a='n'):
     d=compare(c)
     output(d)
 def output(d):
-    cc=[]
     #pdb.set_trace()
-    for item in d:
-        ee=0        
-        for dkey,dvalue in item.items():
-            if ee==0:
-                aa=len(dvalue)+1
-                bb=['']*aa
-                bb[0]=dkey
-                for a in range(0,aa-1):
-                    bb[a+1]=dvalue[a]
-            else:
-                bb[0]=bb[0]+','+dkey
-                for a in range(0,aa-1):
-                    bb[a+1]=bb[a+1]+','+dvalue[a]
-            ee+=1
-        cc.append(bb)
-    for iter in cc:
-        for iter1 in iter:
-            print(iter1)
+    for item in d: 
+        str=''      
+        for item2 in item:
+            str=str+item2
+        print(str)
 def compare(a):
     notin=[]
     filename=[]
@@ -147,8 +133,9 @@ def compare(a):
     for filekey,filevalue in file.items():          #filekey表名，filevalue单元格字典
         diff=[]                             #记录表之间的不同
         diff.append(filekey)
+        jj=0
+        cell=[]      #记录每个表中所有单元格的不同
         if len(filevalue)!=0:
-            cell=[]                         #记录每个表中所有单元格的不同
             for filevaluekey in filevalue.keys():       #filevaluekey单元格名                
                 temp=[]                     #每个单元格的不同
                 ii=0
@@ -163,7 +150,11 @@ def compare(a):
                         else:
                             temp.append('没有'+filekey)
                     if ii==len(a):
-                        yn=False
+                        if yn==True:
+                            yn=False
+                            notin.append(filename)
+                        else:
+                            pass
                         for s in range(0,len(temp)-1):
                             for r in range(s+1,len(temp)):
                                 if temp[s]!=temp[r]:
@@ -175,15 +166,52 @@ def compare(a):
                                             break
                                     break
                                 else:
-                                    if s==len(temp)-1 and r==len(temp):
+                                    if s==len(temp)-2 and r==len(temp)-1:
                                         break
                             break
-                            notin.append(filename)
                         break
+                    continue
+            for ab in cell:
+                diff.append(ab)
+            notin.append(diff)
         else:
-            #diff.append('空表')
-            pass
-
+            temp1=[]
+            for i in a:
+                jj=jj+1
+                for key,value in i.items():       #key文件名，value表名字典
+                    if yn==True:                    #产生表名行
+                        filename.append(key)
+                    if filekey in value:
+                        temp1.append('空表')
+                        break
+                    else:
+                        temp1.append('没有'+filekey)
+                if jj==len(a):
+                    if yn==True:
+                        yn=False
+                        notin.append(filename)
+                    else:
+                        pass
+                    for s in range(0,len(temp1)-1):
+                        for r in range(s+1,len(temp1)):
+                            if temp1[s]!=temp1[r]:
+                                for aa in range(0,len(temp1)):
+                                    if cell:
+                                        cell[aa]=cell[aa]+','+temp1[aa]
+                                    else:
+                                        cell=temp1
+                                        break
+                                break
+                            else:
+                                if s==len(temp1)-2 and r==len(temp1)-1:
+                                    break
+                        break
+                    break
+                continue
+            if cell:
+                for ab in cell:
+                    diff.append(ab)
+                notin.append(diff)
     return notin
 
 
