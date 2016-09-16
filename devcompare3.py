@@ -121,8 +121,11 @@ def output(d):
     #pdb.set_trace()
     for item in d: 
         str=''      
-        for item2 in item:
-            str=str+item2
+        for item2 in range(0,len(item)):
+            if item2!=len(item) and item2!=0:
+                str=str+';'+item[item2]
+            else:
+                str=str+item[item2]
         print(str)
 def compare(a):
     notin=[]
@@ -160,7 +163,10 @@ def compare(a):
                                 if temp[s]!=temp[r]:
                                     for aa in range(0,len(temp)):
                                         if cell:
-                                            cell[aa]=cell[aa]+','+temp[aa]
+                                            if cell[aa][:2]!='没有':
+                                                cell[aa]=cell[aa]+','+temp[aa]
+                                            else:
+                                                pass
                                         else:
                                             cell=temp
                                             break
