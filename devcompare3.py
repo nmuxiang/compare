@@ -3,7 +3,6 @@ import xlrd
 import sys
 import json
 import re
-import math
 #import pdb
 #读取文件名
 file={}
@@ -25,89 +24,127 @@ def sheetstodict(a,d):
             wb=xlrd.open_workbook(key)
             shts={}
             if d:
-                for s in wb.sheets():
-                    c=readcelltodict(s,d)
-                    shts[s.name]=c
-                    b[key]=shts
-            for s in wb.sheets():
-                c=readcelltodict(s)
-                shts[s.name]=c
-                dd=c.keys()
-                try:
-                    cc=file[s.name].keys()
-                except KeyError:
-                    file[s.name]=dict.fromkeys(dd,'')
-                else:
-                    ll=list(set(dd).union(set(cc)))
-                    file[s.name]=dict.fromkeys(ll)
-            b[key]=shts
-            aa.append(b)
-    #pdb.set_trace()
-    for iter in aa:
-        for key,value in iter.items():
-            for key1,value1 in value.items():
-                for key2,value2 in file[key1].items():
-                    if key2 in value1:
-                        pass
+                for dkey,dvalue in d.items():
+                    if dvalue!='':
+                        for s in wb.sheets():
+                            if s.name==dkey:
+                                c=readcelltodict(s,dvalue)
+                                shts[s.name]=c
+                                b[key]=shts
+                                dd=c.keys()
+                                file[dkey]=dict.fromkeys(dd,'')
+                                break
                     else:
-                        value1[key2]=''
+                        for s in wb.sheets():
+                            if s.name==dkey:
+                                c=readcelltodict(s)
+                                dd=c.keys()
+                                try:
+                                    cc=file[dkey].keys()
+                                except KeyError:
+                                    file[dkey]=dict.fromkeys(dd,'')
+                                else:
+                                    ll=list(set(dd).union(set(cc)))
+                                    file[dkey]=dict.fromkeys(ll)
+                                for cellkey in file[dkey]:
+                                    if cellkey in c:
+                                        pass
+                                    else:
+                                        c[cellkey]=''
+                                    for aaitem in aa:
+                                        for aaitemkey,aaitemvalue in aaitem.items():
+                                            if cellkey in aaitemvalue[s.name]:
+                                                pass
+                                            else:
+                                                aaitemvalue[dkey][cellkey]=''
+                                shts[s.name]=c
+                                b[key]=shts
+                                break
+            else:
+                for s in wb.sheets():
+                    c=readcelltodict(s)
+                    dd=c.keys()
+                    try:
+                        cc=file[s.name].keys()
+                    except KeyError:
+                        file[s.name]=dict.fromkeys(dd,'')
+                    else:
+                        ll=list(set(dd).union(set(cc)))
+                        file[s.name]=dict.fromkeys(ll)
+                    for cellkey in file[s.name]:
+                        if cellkey in c:
+                            pass
+                        else:
+                            c[cellkey]=''
+                        for aaitem in aa:
+                            for aaitemkey,aaitemvalue in aaitem.items():
+                                if cellkey in aaitemvalue[s.name]:
+                                    pass
+                                else:
+                                    aaitemvalue[s.name][cellkey]=''
+                    shts[s.name]=c
+                b[key]=shts
+            aa.append(b)
+            #for iter in aa:
+            #    for key,value in iter.items():
+            #        for key1,value1 in value.items():
+            #            for key2,value2 in file[key1].items():
+            #                if key2 in value1:
+            #                    pass
+            #                else:
+            #                    value1[key2]=''
     return aa   
 
-#不载入配置文件读取每个表中单元格的值和位置
-#def readcelltodict(a):
-#    b={}
-#    for row in range(a.nrows):
-#        for col in range(a.ncols):
-#            b[xlrd.cellname(row,col)]=a.cell(row,col).value
-#    return b
-
-#载入配置文件读取每个表中单元格的值和位置
 def readcelltodict(a,d=None):
     b={}
     if d:
-        for key,value in d.items():
-            if a.name==d.key:
-                c=convertstrtonumber(d.value)
-                for row in range(c[0][1],c[1][1]):
-                    for col in range(c[0][0],c[1][0]):
-                        b[xlrd.cellname(row,col)]=a.cell(row,col).value
-    for row in range(a.nrows):
-        for col in range(a.ncols):
-            b[xlrd.cellname(row,col)]=a.cell(row,col).value
+        c=convertstrtonumber(d)
+        rowstart=c[0][1]
+        rowend=c[1][1]+1
+        colstart=c[0][0]
+        colend=c[1][0]+1
+        for row in range(rowstart,rowend):
+            for col in range(colstart,colend):
+                try:
+                    cellvalue=a.cell(row,col).value
+                    b[xlrd.cellname(row,col)]=cellvalue
+                except IndexError:
+                    b[xlrd.cellname(row,col)]=''
+    else:
+        for row in range(a.nrows):
+            for col in range(a.ncols):
+                b[xlrd.cellname(row,col)]=a.cell(row,col).value
     return b
 
 def convertstrtonumber(a):
     b=a.split(':')
     e=[]
-    for i in b:
+    for cellloc in b:
         g=[]
-        c=re.match("^\w[A-Z]*",i)
+        c=re.match("^\w[A-Z]*",cellloc).group()
         f=convertalphabettonumber(c)
-        g.add(f)
-        d=re.match("\d[0-9]*",i)
-        g.add(d)
-        e.add(g)
+        g.append(f)
+        d=re.search("\d[0-9]*",cellloc).group()
+        d=int(d)-1
+        g.append(d)
+        e.append(g)
     return e
 
-alphabet={'A':1,'B':2,'C':3,'D':4,'E':5,'F':6,'G':7,'H':8,'I':9,'J':10,'K':11,'L':12,'M':13,'N':14,'O':15,'P':16,'Q':17,'R':18,'S':19,'T':20,'U':21,'V':22,'W':23,'X':24,'Y':25,'Z':26}
+alphabet={'A':0,'B':1,'C':2,'D':3,'E':4,'F':5,'G':6,'H':7,'I':8,'J':9,'K':10,'L':11,'M':12,'N':13,'O':14,'P':15,'Q':16,'R':17,'S':18,'T':29,'U':20,'V':21,'W':22,'X':23,'Y':24,'Z':25}
 def convertalphabettonumber(a):
-    l=len(a)
+    ll=len(a)
     s=0
-    for i in range(1,l):
-        s=s+a[i]*(l-i)*26
+    for i in range(0,ll):
+        s=s+alphabet[a[i]]*(26**(ll-1-i))
     return s
-
-#def readfilenosetting(a='n'):
-#    readFile=tkinter.filedialog.askopenfilenames()
-#    b=tupletodict(readFile)
-#    c=sheetstodict(b)
-
     
 def readfilesetting(a='n'):
     d={}
     if a=='y':
         try:
-            d=json.load(open('/setting.json','r'))
+            f=open('setting.json','r')
+            #ff=f.read()
+            d=json.load(f)
         except IOError:
             print('open file error')
         except FileNotFoundError:
@@ -231,7 +268,7 @@ e to exit ''')
                 raise ValueError
             else:
                 if a=='y' or a=='n':
-                    readfilesetting()
+                    readfilesetting(a)
                 elif a=='e':
                     sys.exit()
         except ValueError:
