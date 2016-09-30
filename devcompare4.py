@@ -5,44 +5,42 @@ import json
 import re
 #import pdb
 #读取文件名
-file={}
+allSheets={}
 def getexcelfiledict(readFile):
-    excelfiledict={}
-    for item in readFile:
-        excelfiledict[item]=''
-    return excelfiledict
+    excelFileDict={}
+    for iter in readFile:
+        excelFileDict[item]=''
+    return excelFileDict
 
 #读取每个文件中的表名
-def getsheetsdict(excelfiledict,setting):
-    aa=[]
+def getsheetsdict(excelFileDict,setting):
+    allFiles=[]
     #excelfiledict从列表改为字典
-    for key,value in excelfiledict.items():
-        b={}
-        wb=xlrd.open_workbook(key)
-        shts={}
-        if d:
-            for dkey,dvalue in d.items():
-                if dvalue!='':
-                    for s in wb.sheets():
-                        if s.name==dkey:
-                            c=readcelltodict(s,dvalue)
-                            shts[s.name]=c
-                            b[key]=shts
-                            dd=c.keys()
-                            file[dkey]=dict.fromkeys(dd,'')
-                            break
+    if setting:
+        for key in excelFileDict.keys():
+            oneFile={}
+            wb=xlrd.open_workbook(key)
+            oneSheet={}
+            for setting_key,setting_value in setting.items():
+                if setting_value!='':
+                    for sheet in wb.sheets():
+                        if sheet.name==setting_key:
+                            allCellsinOneSheet=readcelltodict(sheet,setting_value)
+                            oneSheet[sheet.name]=allCellsinOneSheet
+                            allCellsinOneSheet_keys=allCellsinOneSheet.keys()
+                            allSheets[sheet.name]=dict.fromkeys(allCellsinOneSheet_keys,'')
                 else:
-                    for s in wb.sheets():
-                        if s.name==dkey:
-                            c=readcelltodict(s)
-                            dd=c.keys()
+                    for sheet in wb.sheets():
+                        if sheet.name==setting_key:
+                            allCellsinOneSheet=readcelltodict(sheet)
+                            allCellsinOneSheet_keys=allCellsinOneSheet.keys()
                             try:
-                                cc=file[dkey].keys()
+                                allSheets_keys=allSheets[sheet.name].keys()
                             except KeyError:
-                                file[dkey]=dict.fromkeys(dd,'')
+                                allSheets[sheet.name]=dict.fromkeys(allCellsinOneSheet_keys,'')
                             else:
-                                ll=list(set(dd).union(set(cc)))
-                                file[dkey]=dict.fromkeys(ll)
+                                allCellinSheet_keys=list(set(allCellsinOneSheet_keys).union(set(allSheets_keys)))
+                                allSheets[sheet.name]=dict.fromkeys(allCellinSheet_keys)
                             for cellkey in file[dkey]:
                                 if cellkey in c:
                                     pass
@@ -57,46 +55,29 @@ def getsheetsdict(excelfiledict,setting):
                             shts[s.name]=c
                             b[key]=shts
                             break
-        else:
-            for s in wb.sheets():
-                c=readcelltodict(s)
-                dd=c.keys()
+    else:
+        for key in excelFileDict.keys():
+            oneFile={}
+            wb=xlrd.open_workbook(key)
+            oneSheet={}
+            for sheet in wb.sheets():
+                allCellsinOneSheet=readcelltodict(sheet)
+                allCellsinOneSheet_keys=allCellsinOneSheet.keys()
                 try:
-                    cc=file[s.name].keys()
+                    allSheets_keys=allSheets[sheet.name].keys()
                 except KeyError:
-                    file[s.name]=dict.fromkeys(dd)
+                    allSheets[sheet.name]=dict.fromkeys(allCellsinOneSheet_keys)
                 else:
-                    ll=list(set(dd).union(set(cc)))
-                    file[s.name]=dict.fromkeys(ll)
-                    for filevaluekey in file[s.name].keys():
-                        if filevaluekey not in c.keys():
-                            c[filevaluekey]=''
-                    for aaitem in aa:
-                        for aaitemkey,aaitemvalue in aaitem.items():
-                            for cellkey in dd:
-                                if s.name in aaitemvalue:
-                                    if cellkey in aaitemvalue[s.name]:
-                                        pass
-                                    else:
-                                        aaitemvalue[s.name][cellkey]=''
-                                else:
-                                    pass
-                shts[s.name]=c
-            b[key]=shts
-        aa.append(b)
-        #for iter in aa:
-        #    for key,value in iter.items():
-        #        for key1,value1 in value.items():
-        #            for key2,value2 in file[key1].items():
-        #                if key2 in value1:
-        #                    pass
-        #                else:
-        #                    value1[key2]=''
-    return aa   
+                    allCellinSheet_keys=list(set(allCellsinOneSheet_keys).union(set(allSheets_keys)))
+                    allSheets[sheet.name]=dict.fromkeys(allCellinSheet_keys)
+                oneSheet[sheet.name]=allCellsinOneSheet
+            oneFile[key]=oneSheet
+        allFiles.append(oneFile)
+        return allFiles
 
-def readcelltodict(a,d=None):
-    b={}
-    if d:
+def readcelltodict(sheet,setting=None):
+    allCellsinOneSheet={}
+    if setting:
         c=convertstrtonumber(d)
         rowstart=c[0][1]
         rowend=c[1][1]+1
@@ -110,10 +91,10 @@ def readcelltodict(a,d=None):
                 except IndexError:
                     b[xlrd.cellname(row,col)]=''
     else:
-        for row in range(a.nrows):
-            for col in range(a.ncols):
-                b[xlrd.cellname(row,col)]=a.cell(row,col).value
-    return b
+        for row in range(sheet.nrows):
+            for col in range(sheet.ncols):
+                allCellsinOneSheet[xlrd.cellname(row,col)]=sheet.cell(row,col).value
+    return allCellsinOneSheet
 
 def convertstrtonumber(a):
     b=a.split(':')
@@ -141,16 +122,16 @@ def readfilesetting(choice='n'):
     setting={}
     if choice=='y':
         try:
-            settingfile=open('setting.json','r')
+            settingFile=open('setting.json','r')
             #ff=f.read()
-            setting=json.load(settingfile)
+            setting=json.load(settingFile)
         except IOError:
             print('open file error')
         except FileNotFoundError:
             print('can not find setting.json')
     readFile=tkinter.filedialog.askopenfilenames()
-    excelfiledict=getexcelfiledict(readFile)
-    allfiledict=getsheetsdict(excelfiledict,setting)
+    excelFileDict=getexcelfiledict(readFile)
+    allFileDict=getsheetsdict(excelFileDict,setting)
     result=compare(allfiledict)
     output(result)
 def output(result):
