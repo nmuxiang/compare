@@ -29,6 +29,7 @@ def getsheetsdict(excelFileDict,setting):
                             oneSheet[sheet.name]=allCellsinOneSheet
                             allCellsinOneSheet_keys=allCellsinOneSheet.keys()
                             allSheets[sheet.name]=dict.fromkeys(allCellsinOneSheet_keys,'')
+                            break
                 else:
                     for sheet in wb.sheets():
                         if sheet.name==setting_key:
@@ -41,20 +42,23 @@ def getsheetsdict(excelFileDict,setting):
                             else:
                                 allCellinSheet_keys=list(set(allCellsinOneSheet_keys).union(set(allSheets_keys)))
                                 allSheets[sheet.name]=dict.fromkeys(allCellinSheet_keys)
-                            for cellkey in file[dkey]:
-                                if cellkey in c:
+                            for allSheet_value_key in allSheets[sheet.name].keys():
+                                if allSheet_value_key in allCellsinOneSheet_keys:
                                     pass
                                 else:
-                                    c[cellkey]=''
-                                for aaitem in aa:
-                                    for aaitemkey,aaitemvalue in aaitem.items():
-                                        if cellkey in aaitemvalue[s.name]:
+                                    allCellsinOneSheet[allSheet_value_key]=''
+                            for oneFile_key,oneFile_value in oneFile.items():
+                                if sheet.name in oneFile_value.keys():
+                                    for allSheet_value_key in allSheets[sheet.name].keys():
+                                        if allSheet_value_key in oneFile_value[sheet.name].keys():
                                             pass
                                         else:
-                                            aaitemvalue[dkey][cellkey]=''
-                            shts[s.name]=c
-                            b[key]=shts
+                                             oneFile_value[sheet.name][allSheet_value_key]=''
+                                else:
+                                    pass 
+                            oneSheet[sheet.name]=allCellsinOneSheet   
                             break
+            oneFile[key]=oneSheet
     else:
         for key in excelFileDict.keys():
             oneFile={}
@@ -72,13 +76,23 @@ def getsheetsdict(excelFileDict,setting):
                     allSheets[sheet.name]=dict.fromkeys(allCellinSheet_keys)
                 oneSheet[sheet.name]=allCellsinOneSheet
             oneFile[key]=oneSheet
-        allFiles.append(oneFile)
-        return allFiles
+        for allSheet_key,allSheet_value in allSheets.items():
+            for oneFile_key,oneFile_value in oneFile.items():
+                if allSheet_key in oneFile_value.keys():
+                    for allSheet_value_key in allSheet_value.keys():
+                        if allSheet_value_key in oneFile_value[allSheet_key].keys():
+                            pass
+                        else:
+                            oneFile_value[allSheet_key][allSheet_value_key]=''
+                else:
+                    pass
+    allFiles.append(oneFile)
+    return allFiles
 
 def readcelltodict(sheet,setting=None):
     allCellsinOneSheet={}
     if setting:
-        c=convertstrtonumber(d)
+        c=convertstrtonumber(setting)
         rowstart=c[0][1]
         rowend=c[1][1]+1
         colstart=c[0][0]
@@ -96,27 +110,27 @@ def readcelltodict(sheet,setting=None):
                 allCellsinOneSheet[xlrd.cellname(row,col)]=sheet.cell(row,col).value
     return allCellsinOneSheet
 
-def convertstrtonumber(a):
-    b=a.split(':')
+def convertstrtonumber(setting):
+    cellRange=setting.split(':')
     e=[]
-    for cellloc in b:
+    for cellAdrress in cellRange:
         g=[]
-        c=re.match("^\w[A-Z]*",cellloc).group()
-        f=convertalphabettonumber(c)
+        rowAlphabet=re.match("^\w[A-Z]*",cellAdrress).group()
+        f=convertalphabettonumber(rowAlphabet)
         g.append(f)
-        d=re.search("\d[0-9]*",cellloc).group()
+        d=re.search("\d[0-9]*",cellAdrress).group()
         d=int(d)-1
         g.append(d)
         e.append(g)
     return e
 
 alphabet={'A':0,'B':1,'C':2,'D':3,'E':4,'F':5,'G':6,'H':7,'I':8,'J':9,'K':10,'L':11,'M':12,'N':13,'O':14,'P':15,'Q':16,'R':17,'S':18,'T':29,'U':20,'V':21,'W':22,'X':23,'Y':24,'Z':25}
-def convertalphabettonumber(a):
-    ll=len(a)
-    s=0
-    for i in range(0,ll):
-        s=s+alphabet[a[i]]*(26**(ll-1-i))
-    return s
+def convertalphabettonumber(rowAlphabet):
+    length=len(rowAlphabet)
+    rowNumber=0
+    for i in range(0,length):
+        rowNumber=rowNumber+alphabet[rowAlphabet[i]]*(26**(length-1-i))
+    return rowNumber
     
 def readfilesetting(choice='n'):
     setting={}
