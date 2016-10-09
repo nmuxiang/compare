@@ -9,7 +9,7 @@ allSheets={}
 def getexcelfiledict(readFile):
     excelFileDict={}
     for iter in readFile:
-        excelFileDict[item]=''
+        excelFileDict[iter]=''
     return excelFileDict
 
 #读取每个文件中的表名
@@ -59,7 +59,7 @@ def getsheetsdict(excelFileDict,setting):
                                     pass 
                             oneSheet[sheet.name]=allCellsinOneSheet   
                             break
-            allFilesDict_value[key]=oneSheet
+            allFilesDict[key]=oneSheet
     else:
         for key in excelFileDict.keys():
             wb=xlrd.open_workbook(key)
@@ -92,17 +92,17 @@ def readcelltodict(sheet,setting=None):
     allCellsinOneSheet={}
     if setting:
         zone=convertstrtonumber(setting)
-        rowstart=zone[startRow]
-        rowend=zone[endColumn]+1
-        colstart=zone[startColumn]
-        colend=zone[endRow]+1
+        rowstart=zone['startRow']
+        rowend=zone['endColumn']+1
+        colstart=zone['startColumn']
+        colend=zone['endRow']+1
         for row in range(rowstart,rowend):
             for col in range(colstart,colend):
                 try:
-                    cellvalue=a.cell(row,col).value
-                    b[xlrd.cellname(row,col)]=cellvalue
+                    cellvalue=sheet.cell(row,col).value
+                    allCellsinOneSheet[xlrd.cellname(row,col)]=cellvalue
                 except IndexError:
-                    b[xlrd.cellname(row,col)]=''
+                    allCellsinOneSheet[xlrd.cellname(row,col)]=''
     else:
         for row in range(sheet.nrows):
             for col in range(sheet.ncols):
@@ -119,11 +119,11 @@ def convertstrtonumber(setting):
         colNumber=re.search("\d[0-9]*",cellAdrress).group()
         colNumber=int(colNumber)-1
         if zone:
-            zone[endRow]=rowNumber
-            zone[endColumn]=colNumber
+            zone['endRow']=rowNumber
+            zone['endColumn']=colNumber
         else:
-            zone[startRow]=rowNumber
-            zone[startColumn]=colNumber
+            zone['startRow']=rowNumber
+            zone['startColumn']=colNumber
     return zone
 alphabet={'A':1,'B':2,'C':3,'D':4,'E':5,'F':6,'G':7,'H':8,'I':9,'J':10,'K':11,'L':12,'M':13,'N':14,'O':15,'P':16,'Q':17,'R':18,'S':19,'T':20,'U':21,'V':22,'W':23,'X':24,'Y':25,'Z':26}
 def convertalphabettonumber(rowAlphabet):
@@ -161,34 +161,33 @@ def output(result):
         print(str)
 def compare(allFilesDict):
     notin=[]
-    filename={}
-    filename.append('File Name')
+    #filename={}
+    #filename.append('File Name')
     diff={}
     sameSheet={}
     comparecell=[]
     yn=True
     for allSheets_key,allSheets_value in allSheets.items():          #allSheets_key表名，allSheets_value单元格字典
         temp={}
+        allFileCell=[]
         for allFilesDict_key,allFilesDict_value in allFilesDict.items():    #allFilesDict_key文件名,allFilesDict_value表字典
             if allSheets_key in allFilesDict_value:     #如果表在此文件的表字典中
                 for allSheets_value_key in allSheets_value.keys():
-                    cell={}
-                    cell[allSheets_value_key]=allFilesDict_value[allSheets_key][allSheets_value_key]
-                    temp[allFilesDict_key]=cell
-                    comparecell.append(temp)
+                    cell=[]
+                    cell.append(allFilesDict_key)
+                    cell.append(allFilesDict_value[allSheets_key][allSheets_value_key])
+                    allFileCell.append(cell)
+                    sameSheet[allSheets_value_key]=allFileCell
             else:
                 temp[allFilesDict_key]='None'
                 sameSheet[allSheets_key]=temp
-        for i in range(0,len(comparecell)-1):
-            for i_key,i_value in comparecell[i].items():    #i_key文件名 i_value表名字典
-                for i_value_key,i_value_value in i_value.keys():    #i_value_key表名 i_value_value单元格字典
-                    for i_value_value__key,i_value_value__value in i_value_value.items():
-                        for j in range(i+1,len(comparecell)):
-                            for j_key,j_value in comparecell[j].items():
-                            if i_value_key
-                        
-def comparecell(temp):
-    
+        for sameSheet_key,sameSheet_value in sameSheet:
+            for i in range(0,len(sameSheet_value)-1):
+                for j in range(i+1,len(sameSheet_value)):
+                    if sameSheet_value[i][1]!=sameSheet_value[j][1]:
+                    
+                    
+    return notin
         
 ##        diff=[]                             #记录表之间的不同
 ##        diff.append(filekey)
