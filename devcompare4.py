@@ -14,11 +14,10 @@ def getexcelfiledict(readFile):
 
 #读取每个文件中的表名
 def getsheetsdict(excelFileDict,setting):
-    allFiles=[]
+    allFilesDict={}
     #excelfiledict从列表改为字典
     if setting:
         for key in excelFileDict.keys():
-            oneFile={}
             wb=xlrd.open_workbook(key)
             oneSheet={}
             for setting_key,setting_value in setting.items():
@@ -42,26 +41,27 @@ def getsheetsdict(excelFileDict,setting):
                             else:
                                 allCellinSheet_keys=list(set(allCellsinOneSheet_keys).union(set(allSheets_keys)))
                                 allSheets[sheet.name]=dict.fromkeys(allCellinSheet_keys)
+                                
                             for allSheet_value_key in allSheets[sheet.name].keys():
                                 if allSheet_value_key in allCellsinOneSheet_keys:
                                     pass
                                 else:
                                     allCellsinOneSheet[allSheet_value_key]=''
-                            for oneFile_key,oneFile_value in oneFile.items():
-                                if sheet.name in oneFile_value.keys():
+                                    
+                            for allFilesDict_key,allFilesDict_value in allFilesDict.items():
+                                if sheet.name in allFilesDict_value.keys():
                                     for allSheet_value_key in allSheets[sheet.name].keys():
-                                        if allSheet_value_key in oneFile_value[sheet.name].keys():
+                                        if allSheet_value_key in allFilesDict_value[sheet.name].keys():
                                             pass
                                         else:
-                                             oneFile_value[sheet.name][allSheet_value_key]=''
+                                             allFilesDict_value[sheet.name][allSheet_value_key]=''
                                 else:
                                     pass 
                             oneSheet[sheet.name]=allCellsinOneSheet   
                             break
-            oneFile[key]=oneSheet
+            allFilesDict_value[key]=oneSheet
     else:
         for key in excelFileDict.keys():
-            oneFile={}
             wb=xlrd.open_workbook(key)
             oneSheet={}
             for sheet in wb.sheets():
@@ -75,28 +75,27 @@ def getsheetsdict(excelFileDict,setting):
                     allCellinSheet_keys=list(set(allCellsinOneSheet_keys).union(set(allSheets_keys)))
                     allSheets[sheet.name]=dict.fromkeys(allCellinSheet_keys)
                 oneSheet[sheet.name]=allCellsinOneSheet
-            oneFile[key]=oneSheet
+            allFilesDict[key]=oneSheet
         for allSheet_key,allSheet_value in allSheets.items():
-            for oneFile_key,oneFile_value in oneFile.items():
-                if allSheet_key in oneFile_value.keys():
+            for allFilesDict_key,allFilesDict_value in allFilesDict.items():
+                if allSheet_key in allFilesDict_value.keys():
                     for allSheet_value_key in allSheet_value.keys():
-                        if allSheet_value_key in oneFile_value[allSheet_key].keys():
+                        if allSheet_value_key in allFilesDict_value[allSheet_key].keys():
                             pass
                         else:
-                            oneFile_value[allSheet_key][allSheet_value_key]=''
+                            allFilesDict_value[allSheet_key][allSheet_value_key]=''
                 else:
                     pass
-    allFiles.append(oneFile)
-    return allFiles
+    return allFilesDict
 
 def readcelltodict(sheet,setting=None):
     allCellsinOneSheet={}
     if setting:
-        c=convertstrtonumber(setting)
-        rowstart=c[0][1]
-        rowend=c[1][1]+1
-        colstart=c[0][0]
-        colend=c[1][0]+1
+        zone=convertstrtonumber(setting)
+        rowstart=zone[startRow]
+        rowend=zone[endColumn]+1
+        colstart=zone[startColumn]
+        colend=zone[endRow]+1
         for row in range(rowstart,rowend):
             for col in range(colstart,colend):
                 try:
@@ -112,24 +111,26 @@ def readcelltodict(sheet,setting=None):
 
 def convertstrtonumber(setting):
     cellRange=setting.split(':')
-    e=[]
+    zone={}
     for cellAdrress in cellRange:
         g=[]
         rowAlphabet=re.match("^\w[A-Z]*",cellAdrress).group()
-        f=convertalphabettonumber(rowAlphabet)
-        g.append(f)
-        d=re.search("\d[0-9]*",cellAdrress).group()
-        d=int(d)-1
-        g.append(d)
-        e.append(g)
-    return e
-
-alphabet={'A':0,'B':1,'C':2,'D':3,'E':4,'F':5,'G':6,'H':7,'I':8,'J':9,'K':10,'L':11,'M':12,'N':13,'O':14,'P':15,'Q':16,'R':17,'S':18,'T':29,'U':20,'V':21,'W':22,'X':23,'Y':24,'Z':25}
+        rowNumber=convertalphabettonumber(rowAlphabet)
+        colNumber=re.search("\d[0-9]*",cellAdrress).group()
+        colNumber=int(colNumber)-1
+        if zone:
+            zone[endRow]=rowNumber
+            zone[endColumn]=colNumber
+        else:
+            zone[startRow]=rowNumber
+            zone[startColumn]=colNumber
+    return zone
+alphabet={'A':1,'B':2,'C':3,'D':4,'E':5,'F':6,'G':7,'H':8,'I':9,'J':10,'K':11,'L':12,'M':13,'N':14,'O':15,'P':16,'Q':17,'R':18,'S':19,'T':20,'U':21,'V':22,'W':23,'X':24,'Y':25,'Z':26}
 def convertalphabettonumber(rowAlphabet):
     length=len(rowAlphabet)
     rowNumber=0
     for i in range(0,length):
-        rowNumber=rowNumber+alphabet[rowAlphabet[i]]*(26**(length-1-i))
+        rowNumber=rowNumber+alphabet[rowAlphabet[i]]*(26**(length-i-1))
     return rowNumber
     
 def readfilesetting(choice='n'):
@@ -146,7 +147,7 @@ def readfilesetting(choice='n'):
     readFile=tkinter.filedialog.askopenfilenames()
     excelFileDict=getexcelfiledict(readFile)
     allFileDict=getsheetsdict(excelFileDict,setting)
-    result=compare(allfiledict)
+    result=compare(allFileDict)
     output(result)
 def output(result):
     #pdb.set_trace()
@@ -158,98 +159,122 @@ def output(result):
             else:
                 str=str+item[item2]
         print(str)
-def compare(a):
+def compare(allFilesDict):
     notin=[]
-    filename=[]
+    filename={}
     filename.append('File Name')
+    diff={}
+    sameSheet={}
+    comparecell=[]
     yn=True
-    #pdb.set_trace()
-    for filekey,filevalue in file.items():          #filekey表名，filevalue单元格字典
-        diff=[]                             #记录表之间的不同
-        diff.append(filekey)
-        jj=0
-        cell=[]      #记录每个表中所有单元格的不同
-        if len(filevalue)!=0:
-            for filevaluekey in filevalue.keys():       #filevaluekey单元格名                
-                temp=[]                     #每个单元格的不同
-                ii=0
-                for i in a:
-                    ii=ii+1
-                    for key,value in i.items():       #key文件名，value表名字典
-                        if yn==True:                    #产生表名行
-                            filename.append(key)
-                        if filekey in value:
-                           temp.append(filevaluekey+'单元格'+str(value[filekey][filevaluekey]))
-                           break
-                        else:
-                            temp.append('没有'+filekey)
-                    if ii==len(a):
-                        if yn==True:
-                            yn=False
-                            notin.append(filename)
-                        else:
-                            pass
-                        for s in range(0,len(temp)-1):
-                            for r in range(s+1,len(temp)):
-                                if temp[s]!=temp[r]:
-                                    for aa in range(0,len(temp)):
-                                        if cell:
-                                            if cell[aa][:2]!='没有':
-                                                cell[aa]=cell[aa]+','+temp[aa]
-                                            else:
-                                                pass
-                                        else:
-                                            cell=temp
-                                            break
-                                    break
-                                else:
-                                    if s==len(temp)-2 and r==len(temp)-1:
-                                        break
-                            break
-                        break
-                    continue
-            for ab in cell:
-                diff.append(ab)
-            notin.append(diff)
-        else:
-            temp1=[]
-            for i in a:
-                jj=jj+1
-                for key,value in i.items():       #key文件名，value表名字典
-                    if yn==True:                    #产生表名行
-                        filename.append(key)
-                    if filekey in value:
-                        temp1.append('空表')
-                        break
-                    else:
-                        temp1.append('没有'+filekey)
-                if jj==len(a):
-                    if yn==True:
-                        yn=False
-                        notin.append(filename)
-                    else:
-                        pass
-                    for s in range(0,len(temp1)-1):
-                        for r in range(s+1,len(temp1)):
-                            if temp1[s]!=temp1[r]:
-                                for aa in range(0,len(temp1)):
-                                    if cell:
-                                        cell[aa]=cell[aa]+','+temp1[aa]
-                                    else:
-                                        cell=temp1
-                                        break
-                                break
-                            else:
-                                if s==len(temp1)-2 and r==len(temp1)-1:
-                                    break
-                        break
-                    break
-                continue
-            if cell:
-                for ab in cell:
-                    diff.append(ab)
-                notin.append(diff)
-    return notin
+    for allSheets_key,allSheets_value in allSheets.items():          #allSheets_key表名，allSheets_value单元格字典
+        temp={}
+        for allFilesDict_key,allFilesDict_value in allFilesDict.items():    #allFilesDict_key文件名,allFilesDict_value表字典
+            if allSheets_key in allFilesDict_value:     #如果表在此文件的表字典中
+                for allSheets_value_key in allSheets_value.keys():
+                    cell={}
+                    cell[allSheets_value_key]=allFilesDict_value[allSheets_key][allSheets_value_key]
+                    temp[allFilesDict_key]=cell
+                    comparecell.append(temp)
+            else:
+                temp[allFilesDict_key]='None'
+                sameSheet[allSheets_key]=temp
+        for i in range(0,len(comparecell)-1):
+            for i_key,i_value in comparecell[i].items():    #i_key文件名 i_value表名字典
+                for i_value_key,i_value_value in i_value.keys():    #i_value_key表名 i_value_value单元格字典
+                    for i_value_value__key,i_value_value__value in i_value_value.items():
+                        for j in range(i+1,len(comparecell)):
+                            for j_key,j_value in comparecell[j].items():
+                            if i_value_key
+                        
+def comparecell(temp):
+    
+        
+##        diff=[]                             #记录表之间的不同
+##        diff.append(filekey)
+##        jj=0
+##        cell=[]      #记录每个表中所有单元格的不同
+##        if len(allSheets_value)!=0:
+##            for filevaluekey in filevalue.keys():       #filevaluekey单元格名                
+##                temp=[]                     #每个单元格的不同
+##                ii=0
+##                for i in a:
+##                    ii=ii+1
+##                    for key,value in i.items():       #key文件名，value表名字典
+##                        if yn==True:                    #产生表名行
+##                            filename.append(key)
+##                        if filekey in value:
+##                           temp.append(filevaluekey+'单元格'+str(value[filekey][filevaluekey]))
+##                           break
+##                        else:
+##                            temp.append('没有'+filekey)
+##                    if ii==len(a):
+##                        if yn==True:
+##                            yn=False
+##                            notin.append(filename)
+##                        else:
+##                            pass
+##                        for s in range(0,len(temp)-1):
+##                            for r in range(s+1,len(temp)):
+##                                if temp[s]!=temp[r]:
+##                                    for aa in range(0,len(temp)):
+##                                        if cell:
+##                                            if cell[aa][:2]!='没有':
+##                                                cell[aa]=cell[aa]+','+temp[aa]
+##                                            else:
+##                                                pass
+##                                        else:
+##                                            cell=temp
+##                                            break
+##                                    break
+##                                else:
+##                                    if s==len(temp)-2 and r==len(temp)-1:
+##                                        break
+##                            break
+##                        break
+##                    continue
+##            for ab in cell:
+##                diff.append(ab)
+##            notin.append(diff)
+##        else:
+##            temp1=[]
+##            for i in a:
+##                jj=jj+1
+##                for key,value in i.items():       #key文件名，value表名字典
+##                    if yn==True:                    #产生表名行
+##                        filename.append(key)
+##                    if filekey in value:
+##                        temp1.append('空表')
+##                        break
+##                    else:
+##                        temp1.append('没有'+filekey)
+##                if jj==len(a):
+##                    if yn==True:
+##                        yn=False
+##                        notin.append(filename)
+##                    else:
+##                        pass
+##                    for s in range(0,len(temp1)-1):
+##                        for r in range(s+1,len(temp1)):
+##                            if temp1[s]!=temp1[r]:
+##                                for aa in range(0,len(temp1)):
+##                                    if cell:
+##                                        cell[aa]=cell[aa]+','+temp1[aa]
+##                                    else:
+##                                        cell=temp1
+##                                        break
+##                                break
+##                            else:
+##                                if s==len(temp1)-2 and r==len(temp1)-1:
+##                                    break
+##                        break
+##                    break
+##                continue
+##            if cell:
+##                for ab in cell:
+##                    diff.append(ab)
+##                notin.append(diff)
+##    return notin
 
 
 #主函数
@@ -268,11 +293,11 @@ e to exit, h to help\r\n''')
 This program used to compare excel files.Out put the difference between mutli files.
 ===================================================================================
 Paramaters
-y   y means you can modify setting.json file,to specify sheets and cells you want to compare.
+y   you can modify setting.json file,to specify sheets and cells you want to compare.
     So Before you input y, you must modify setting.json first.
-n   n means you just select excel files,the program will compare each cell of each sheet of each file.
-e   e means quit program.
-h   h means help.
+n   you just select excel files,the program will compare each cell of each sheet of each file.
+e   quit program.
+h   help.
 ''')
                 elif choice=='e':
                     sys.exit()
