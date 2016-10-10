@@ -147,18 +147,19 @@ def readfilesetting(choice='n'):
     readFile=tkinter.filedialog.askopenfilenames()
     excelFileDict=getexcelfiledict(readFile)
     allFileDict=getsheetsdict(excelFileDict,setting)
-    result=compare(allFileDict)
-    output(result)
-def output(result):
+    outputDict=compare(allFileDict)
+    output(outputDict)
+def output(outputDict):
     #pdb.set_trace()
-    for item in d: 
-        str=''      
-        for item2 in range(0,len(item)):
-            if item2!=len(item) and item2!=0:
-                str=str+';'+item[item2]
-            else:
-                str=str+item[item2]
-        print(str)
+    result=[]
+    line=[]
+    headLineStr='FileName'
+    tempStr=''
+    for outputDict_key,outputDict_value in outputDict.items():
+        headLineStr=headLineStr+';' + outputDict_key     
+        for outputDict_value_key,outputDict_value_value in outputDict_value_key.items():
+            tempStr=outputDict_value_key
+
 def compare(allFilesDict):
     notin=[]
     #filename={}
@@ -177,14 +178,18 @@ def compare(allFilesDict):
         allFileCell=[]
         for allFilesDict_key,allFilesDict_value in allFilesDict.items():    #allFilesDict_key文件名,allFilesDict_value表字典
             if allSheets_key in allFilesDict_value:     #如果表在此文件的表字典中
-                for allSheets_value_key in allSheets_value.keys():
-                    cell=[]
-                    cell.append(allFilesDict_key)
-                    cell.append(allFilesDict_value[allSheets_key][allSheets_value_key])
-                    allFileCell.append(cell)
-                    sameCellinEachFiledDict[allSheets_value_key]=allFileCell
+                try:
+                    for allSheets_value_key in allSheets_value.keys():
+                        cell=[]
+                        cell.append(allFilesDict_key)
+                        cell.append(allFilesDict_value[allSheets_key][allSheets_value_key])
+                        allFileCell.append(cell)
+                        sameCellinEachFiledDict[allSheets_value_key]=allFileCell
+                except KeyError:
+                    outputDict[allFilesDict_key][allSheets_key]='Empty'
             else:
                 outputDict[allFilesDict_key][allSheets_key]='None'
+                
         for sameCellinEachFiledDict_key,sameCellinEachFiledDict_value in sameCellinEachFiledDict.items():
             for i in range(0,len(sameCellinEachFiledDict_value)-1):
                 for j in range(i+1,len(sameCellinEachFiledDict_value)):
