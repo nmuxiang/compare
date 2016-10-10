@@ -164,9 +164,14 @@ def compare(allFilesDict):
     #filename={}
     #filename.append('File Name')
     diff={}
-    sameSheet={}
+    sameCellinEachFiledDict={}
     comparecell=[]
     yn=True
+    
+    outputDict=dict.fromkeys(allFilesDict.keys())
+    for ouputDict_key,ouputDict_value in outputDict.items():
+        ouputDict_value=dict.fromkeys(allSheets.keys())
+        
     for allSheets_key,allSheets_value in allSheets.items():          #allSheets_key表名，allSheets_value单元格字典
         temp={}
         allFileCell=[]
@@ -177,17 +182,25 @@ def compare(allFilesDict):
                     cell.append(allFilesDict_key)
                     cell.append(allFilesDict_value[allSheets_key][allSheets_value_key])
                     allFileCell.append(cell)
-                    sameSheet[allSheets_value_key]=allFileCell
+                    sameCellinEachFiledDict[allSheets_value_key]=allFileCell
             else:
-                temp[allFilesDict_key]='None'
-                sameSheet[allSheets_key]=temp
-        for sameSheet_key,sameSheet_value in sameSheet:
-            for i in range(0,len(sameSheet_value)-1):
-                for j in range(i+1,len(sameSheet_value)):
-                    if sameSheet_value[i][1]!=sameSheet_value[j][1]:
-                    
-                    
-    return notin
+                outputDict[allFilesDict_key][allSheets_key]='None'
+        for sameCellinEachFiledDict_key,sameCellinEachFiledDict_value in sameCellinEachFiledDict.items():
+            for i in range(0,len(sameCellinEachFiledDict_value)-1):
+                for j in range(i+1,len(sameCellinEachFiledDict_value)):
+                    if sameCellinEachFiledDict_value[i][1]!=sameCellinEachFiledDict_value[j][1]:
+                        for iter in sameCellinEachFiledDict_value:
+                            value=outputDict[iter[0]][allSheets_key]
+                            if value!=None:
+                                outputDict[iter[0]][allSheets_key]=value+','+sameCellinEachFiledDict_key+'单元格：'+str(iter[1])
+                            else:
+                                outputDict[iter[0]][allSheets_key]=sameCellinEachFiledDict_key+'单元格：'+str(iter[1])
+                        break
+                    else:
+                        if j==len(sameCellinEachFiledDict_value)-1:
+                            break
+                break
+    return outputDict
         
 ##        diff=[]                             #记录表之间的不同
 ##        diff.append(filekey)
