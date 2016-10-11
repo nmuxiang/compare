@@ -5,13 +5,13 @@ This program is used to compare excel files.Out put the difference between mutli
 Paramaters
 
 
-y      you can modify setting.json file,to specify sheets and cells you want to compare.So Before you input y, you must modify setting.json first.
+y      &emsp;you can modify setting.json file,to specify sheets and cells you want to compare.So Before you input y, you must modify setting.json first.
     
     
-n      you just select excel files,the program will compare each cell of each sheet of each file.
+n      &emsp;you just select excel files,the program will compare each cell of each sheet of each file.
 
 
-e      quit program.
+e      &emsp;quit program.
 
 
 h      help.
