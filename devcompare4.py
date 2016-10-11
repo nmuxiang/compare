@@ -152,14 +152,24 @@ def readfilesetting(choice='n'):
 def output(outputDict):
     #pdb.set_trace()
     result=[]
-    line=[]
+    line={}
     headLineStr='FileName'
-    tempStr=''
     for outputDict_key,outputDict_value in outputDict.items():
-        headLineStr=headLineStr+';' + outputDict_key     
-        for outputDict_value_key,outputDict_value_value in outputDict_value_key.items():
-            tempStr=outputDict_value_key
-
+        headLineStr=headLineStr+';' + outputDict_key
+        if line:
+            pass
+        else:
+            line=dict.fromkeys(outputDict_value.keys(),'')
+        for line_key,line_value in line.items():
+            if line_value!='':
+                tempstr=line_value
+                line_value=tempstr+';'+outputDict_value[line_key]
+            else:
+                line_value=outputDict_value[line_key]
+    print(headLineStr)
+    for line_key,line_value in line.items():
+        tempstr=line_key+';'+line_value
+        print(tempstr)
 def compare(allFilesDict):
     notin=[]
     #filename={}
