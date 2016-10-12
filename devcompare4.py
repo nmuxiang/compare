@@ -1,9 +1,10 @@
 import tkinter.filedialog
 import xlrd
+from xlwt import Workbook
 import sys
 import json
 import re
-#import pdb
+import pdb
 #读取文件名
 allSheets={}
 def getexcelfiledict(readFile):
@@ -137,7 +138,7 @@ def readfilesetting(choice='n'):
     if choice=='y':
         try:
             settingFile=open('setting.json','r')
-            #ff=f.read()
+            pdb.set_trace()
             setting=json.load(settingFile)
         except IOError:
             print('open file error')
@@ -166,10 +167,25 @@ def output(outputDict):
                 line[line_key]=tempstr+SEPARATE+outputDict_value[line_key]
             else:
                 line[line_key]=outputDict_value[line_key]
-    print(headLineStr)
+    book=Workbook()
+    sheet1=book.add_sheet('Sheet1')
+    headLineStrlist=headLineStr.split(',')
+    row=0
+    col=0
+    for iter in headLineStrlist:
+        sheet1.write(row,col,iter)
+        col=col+1
+    row=row+1
     for line_key,line_value in line.items():
-        tempstr=line_key+SEPARATE+line_value
-        print(tempstr)
+        col=0
+        tempstrlist=line_value.split(',')
+        sheet1.write(row,col,line_key)
+        for tempstrlist_iter in tempstrlist:
+            col=col+1
+            sheet1.write(row,col,tempstrlist_iter)
+        row=row+1
+    book.save('result.xls')
+    print('output to result.xls')
 def compare(allFilesDict):
     outputDict=dict.fromkeys(allFilesDict.keys())
     for ouputDict_key,ouputDict_value in outputDict.items():
