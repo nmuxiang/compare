@@ -4,7 +4,7 @@ from xlwt import Workbook
 import sys
 import json
 import re
-import pdb
+#import pdb
 #读取文件名
 allSheets={}
 def getexcelfiledict(readFile):
@@ -138,7 +138,7 @@ def readfilesetting(choice='n'):
     if choice=='y':
         try:
             settingFile=open('setting.json','r')
-            pdb.set_trace()
+            #pdb.set_trace()
             setting=json.load(settingFile)
         except IOError:
             print('open file error')
