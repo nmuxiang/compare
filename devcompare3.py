@@ -3,7 +3,7 @@ import xlrd
 import sys
 import json
 import re
-from time import clock 
+import time  
 #import pdb
 #读取文件名
 file={}
@@ -123,6 +123,7 @@ def convertstrtonumber(a):
     for cellloc in b:
         g=[]
         c=re.match("^\w[A-Z]*",cellloc).group()
+        c=c.upper()
         f=convertalphabettonumber(c)
         g.append(f)
         d=re.search("\d[0-9]*",cellloc).group()
@@ -150,7 +151,8 @@ def readfilesetting(a='n'):
             print('open file error')
         except FileNotFoundError:
             print('can not find setting.json')
-    readFile=tkinter.filedialog.askopenfilenames()
+    readFile=["1.xlsx","2.xlsx","3.xlsx"]
+    #readFile=tkinter.filedialog.askopenfilenames()
     b=tupletodict(readFile)
     c=sheetstodict(b,d)
     d=compare(c)
@@ -261,21 +263,24 @@ def compare(a):
 
 #主函数
 def main():
-
-    while True:
-        try:
-            a=input('''Load setting or not(y or n):
-e to exit ''')
-            if a!='y' and a!='n' and a!='e':
-                raise ValueError
-            else:
-                if a=='y' or a=='n':
-                    readfilesetting(a)
-                    finish=clock()
-                    print(finish-start)
-                elif a=='e':
-                    sys.exit()
-        except ValueError:
-            print('Please enter y or n or e')
-start=clock()
+    choice='y'
+    readfilesetting(choice)
+    finish=time.time()
+    print(finish-start)
+##    while True:
+##        try:
+##            a=input('''Load setting or not(y or n):
+##e to exit ''')
+##            if a!='y' and a!='n' and a!='e':
+##                raise ValueError
+##            else:
+##                if a=='y' or a=='n':
+##                    readfilesetting(a)
+##                    finish=clock()
+##                    print(finish-start)
+##                elif a=='e':
+##                    sys.exit()
+##        except ValueError:
+##            print('Please enter y or n or e')
+start=time.time()
 main()

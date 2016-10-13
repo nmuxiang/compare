@@ -4,7 +4,8 @@ from xlwt import Workbook
 import sys
 import json
 import re
-from time import clock
+import cProfile
+import time
 #import pdb
 
 #读取文件名
@@ -13,6 +14,8 @@ def getexcelfiledict(readFile):
     excelFileDict={}
     for iter in readFile:
         excelFileDict[iter]=''
+    finish=time.time()
+    print("getexcelfiledict:",finish)
     return excelFileDict
 
 #读取每个文件中的表名
@@ -89,6 +92,8 @@ def getsheetsdict(excelFileDict,setting):
                             allFilesDict_value[allSheet_key][allSheet_value_key]=''
                 else:
                     pass
+    finish=time.time()
+    print("getsheetsdict:",finish)
     return allFilesDict
 
 def readcelltodict(key,sheet,setting=None):
@@ -120,6 +125,9 @@ def readcelltodict(key,sheet,setting=None):
         for row in range(sheet.nrows):
             for col in range(sheet.ncols):
                 allCellsinOneSheet[xlrd.cellname(row,col)]=sheet.cell(row,col).value
+    finish=time.time()
+    print("readcelltodict:",finish)
+
     return allCellsinOneSheet
 
 def convertstrtonumber(setting,maxrow,maxcolumn):
@@ -141,6 +149,8 @@ def convertstrtonumber(setting,maxrow,maxcolumn):
         else:
             zone['startRow']=rowNumber
             zone['startColumn']=colNumber
+    finish=time.time()
+    print("convertstrtonumber:",finish)
     return zone
 alphabet={'A':1,'B':2,'C':3,'D':4,'E':5,'F':6,'G':7,'H':8,'I':9,'J':10,'K':11,'L':12,'M':13,'N':14,'O':15,'P':16,'Q':17,'R':18,'S':19,'T':20,'U':21,'V':22,'W':23,'X':24,'Y':25,'Z':26}
 def convertalphabettonumber(rowAlphabet):
@@ -148,6 +158,8 @@ def convertalphabettonumber(rowAlphabet):
     rowNumber=0
     for i in range(0,length):
         rowNumber=rowNumber+alphabet[rowAlphabet[i]]*(26**(length-i-1))
+    finish=time.time()
+    print("convertalphabettonumber:",finish)
     return rowNumber
     
 def readfilesetting(choice='n'):
@@ -161,7 +173,8 @@ def readfilesetting(choice='n'):
             print('open file error')
         except FileNotFoundError:
             print('can not find setting.json')
-    readFile=tkinter.filedialog.askopenfilenames()
+    #readFile=tkinter.filedialog.askopenfilenames()
+    readFile=["1.xlsx","2.xlsx","3.xlsx"]
     excelFileDict=getexcelfiledict(readFile)
     allFileDict=getsheetsdict(excelFileDict,setting)
     outputDict=compare(allFileDict)
@@ -247,32 +260,36 @@ def compare(allFilesDict):
 
 #主函数
 def main():
-    while True:
-        try:
-            choice=input('''Compare excel files with setting.json or not(y or n):
-e to exit, h to help\r\n''')
-            if choice!='y' and choice!='Y' and choice!='n' and choice!='N' and choice!='e' and choice!='E' and choice!='h' and choice!='H':
-                raise ValueError
-            else:
-                if choice=='y'or choice=='Y' or choice=='n' or choice=='N':
-                    readfilesetting(choice)
-                    finish=clock()
-                    print(finish-start)
-                elif choice=='h' or choice=='H':
-                    print('''Introduction
-This program used to compare excel files.Out put the difference between mutli files.
-===================================================================================
-Paramaters
-y   you can modify setting.json file,to specify sheets and cells you want to compare.
-    So Before you input y, you must modify setting.json first.
-n   you just select excel files,the program will compare each cell of each sheet of each file.
-e   quit program.
-h   help.
-''')
-                elif choice=='e' or choice=='E':
-                    sys.exit()
-        except ValueError:
-            print('Please enter y or n or e')
-start=clock()
+    #while True:
+    choice='y'
+    readfilesetting(choice)
+    finish=time.time()
+    print(finish-start)
+##        try:
+##            choice=input('''Compare excel files with setting.json or not(y or n):
+##e to exit, h to help\r\n''')
+##            if choice!='y' and choice!='Y' and choice!='n' and choice!='N' and choice!='e' and choice!='E' and choice!='h' and choice!='H':
+##                raise ValueError
+##            else:
+##                if choice=='y'or choice=='Y' or choice=='n' or choice=='N':
+##                    readfilesetting(choice)
+##                    finish=time.time()
+##                    print(finish-start)
+##                elif choice=='h' or choice=='H':
+##                    print('''Introduction
+##This program used to compare excel files.Out put the difference between mutli files.
+##===================================================================================
+##Paramaters
+##y   you can modify setting.json file,to specify sheets and cells you want to compare.
+##    So Before you input y, you must modify setting.json first.
+##n   you just select excel files,the program will compare each cell of each sheet of each file.
+##e   quit program.
+##h   help.
+##''')
+##                elif choice=='e' or choice=='E':
+##                    sys.exit()
+##        except ValueError:
+##            print('Please enter y or n or e')
+start=time.time()
 main()
 
