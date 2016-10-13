@@ -4,7 +4,9 @@ from xlwt import Workbook
 import sys
 import json
 import re
+from time import clock
 #import pdb
+
 #读取文件名
 allSheets={}
 def getexcelfiledict(readFile):
@@ -25,7 +27,7 @@ def getsheetsdict(excelFileDict,setting):
                 if setting_value!='':
                     for sheet in wb.sheets():
                         if sheet.name==setting_key:
-                            allCellsinOneSheet=readcelltodict(sheet,setting_value)
+                            allCellsinOneSheet=readcelltodict(key,sheet,setting_value)
                             oneSheet[sheet.name]=allCellsinOneSheet
                             allCellsinOneSheet_keys=allCellsinOneSheet.keys()
                             allSheets[sheet.name]=dict.fromkeys(allCellsinOneSheet_keys,'')
@@ -89,10 +91,20 @@ def getsheetsdict(excelFileDict,setting):
                     pass
     return allFilesDict
 
-def readcelltodict(sheet,setting=None):
+def readcelltodict(key,sheet,setting=None):
     allCellsinOneSheet={}
+    xlsmaxrow=65536
+    xlsmaxcolumn=256
+    xlsxmaxrow=16384
+    xlsxmaxcolumn=1048576
+    if key[-1]=='s':
+        maxrow=xlsmaxrow
+        maxcolumn=xlsmaxcolumn
+    else:
+        maxrow=xlsxmaxrow
+        maxcolumn=xlsxmaxcolumn
     if setting:
-        zone=convertstrtonumber(setting)
+        zone=convertstrtonumber(setting,maxrow,maxcolumn)
         rowstart=zone['startRow']
         rowend=zone['endColumn']+1
         colstart=zone['startColumn']
@@ -110,14 +122,19 @@ def readcelltodict(sheet,setting=None):
                 allCellsinOneSheet[xlrd.cellname(row,col)]=sheet.cell(row,col).value
     return allCellsinOneSheet
 
-def convertstrtonumber(setting):
+def convertstrtonumber(setting,maxrow,maxcolumn):
     cellRange=setting.split(':')
     zone={}
     for cellAdrress in cellRange:
         rowAlphabet=re.match("^\w[A-Z]*",cellAdrress).group()
+        rowAlphabet=rowAlphabet.upper()
         rowNumber=convertalphabettonumber(rowAlphabet)-1
         colNumber=re.search("\d[0-9]*",cellAdrress).group()
         colNumber=int(colNumber)-1
+        if rowNumber>maxrow:
+            rowNumber=maxrow
+        if colNumber>maxcolumn:
+            colNumber=maxcolumn
         if zone:
             zone['endRow']=rowNumber
             zone['endColumn']=colNumber
@@ -234,12 +251,14 @@ def main():
         try:
             choice=input('''Compare excel files with setting.json or not(y or n):
 e to exit, h to help\r\n''')
-            if choice!='y' and choice!='n' and choice!='e' and choice!='h':
+            if choice!='y' and choice!='Y' and choice!='n' and choice!='N' and choice!='e' and choice!='E' and choice!='h' and choice!='H':
                 raise ValueError
             else:
-                if choice=='y' or choice=='n':
+                if choice=='y'or choice=='Y' or choice=='n' or choice=='N':
                     readfilesetting(choice)
-                elif choice=='h':
+                    finish=clock()
+                    print(finish-start)
+                elif choice=='h' or choice=='H':
                     print('''Introduction
 This program used to compare excel files.Out put the difference between mutli files.
 ===================================================================================
@@ -250,8 +269,10 @@ n   you just select excel files,the program will compare each cell of each sheet
 e   quit program.
 h   help.
 ''')
-                elif choice=='e':
+                elif choice=='e' or choice=='E':
                     sys.exit()
         except ValueError:
             print('Please enter y or n or e')
+start=clock()
 main()
+
