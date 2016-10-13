@@ -3,6 +3,7 @@ import xlrd
 import sys
 import json
 import re
+from time import clock 
 #import pdb
 #读取文件名
 file={}
@@ -260,6 +261,7 @@ def compare(a):
 
 #主函数
 def main():
+
     while True:
         try:
             a=input('''Load setting or not(y or n):
@@ -269,8 +271,11 @@ e to exit ''')
             else:
                 if a=='y' or a=='n':
                     readfilesetting(a)
+                    finish=clock()
+                    print(finish-start)
                 elif a=='e':
                     sys.exit()
         except ValueError:
             print('Please enter y or n or e')
+start=clock()
 main()
