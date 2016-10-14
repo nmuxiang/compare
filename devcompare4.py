@@ -11,15 +11,17 @@ import time
 #读取文件名
 allSheets={}
 def getexcelfiledict(readFile):
+    start=time.time()
     excelFileDict={}
     for iter in readFile:
         excelFileDict[iter]=''
     finish=time.time()
-    print("getexcelfiledict:",finish)
+    print("getexcelfiledict:",finish-start)
     return excelFileDict
 
 #读取每个文件中的表名
 def getsheetsdict(excelFileDict,setting):
+    start=time.time()
     allFilesDict={}
     #excelfiledict从列表改为字典
     if setting:
@@ -93,10 +95,11 @@ def getsheetsdict(excelFileDict,setting):
                 else:
                     pass
     finish=time.time()
-    print("getsheetsdict:",finish)
+    print("getsheetsdict:",finish-start)
     return allFilesDict
 
 def readcelltodict(key,sheet,setting=None):
+    start=time.time()
     allCellsinOneSheet={}
     xlsmaxrow=65536
     xlsmaxcolumn=256
@@ -126,11 +129,12 @@ def readcelltodict(key,sheet,setting=None):
             for col in range(sheet.ncols):
                 allCellsinOneSheet[xlrd.cellname(row,col)]=sheet.cell(row,col).value
     finish=time.time()
-    print("readcelltodict:",finish)
+    print("readcelltodict:",finish-start)
 
     return allCellsinOneSheet
 
 def convertstrtonumber(setting,maxrow,maxcolumn):
+    start=time.time()
     cellRange=setting.split(':')
     zone={}
     for cellAdrress in cellRange:
@@ -150,16 +154,17 @@ def convertstrtonumber(setting,maxrow,maxcolumn):
             zone['startRow']=rowNumber
             zone['startColumn']=colNumber
     finish=time.time()
-    print("convertstrtonumber:",finish)
+    print("convertstrtonumber:",finish-start)
     return zone
 alphabet={'A':1,'B':2,'C':3,'D':4,'E':5,'F':6,'G':7,'H':8,'I':9,'J':10,'K':11,'L':12,'M':13,'N':14,'O':15,'P':16,'Q':17,'R':18,'S':19,'T':20,'U':21,'V':22,'W':23,'X':24,'Y':25,'Z':26}
 def convertalphabettonumber(rowAlphabet):
+    start=time.time()
     length=len(rowAlphabet)
     rowNumber=0
     for i in range(0,length):
         rowNumber=rowNumber+alphabet[rowAlphabet[i]]*(26**(length-i-1))
     finish=time.time()
-    print("convertalphabettonumber:",finish)
+    print("convertalphabettonumber:",finish-start)
     return rowNumber
     
 def readfilesetting(choice='n'):
@@ -180,6 +185,7 @@ def readfilesetting(choice='n'):
     outputDict=compare(allFileDict)
     output(outputDict)
 def output(outputDict):
+    start=time.time()
     #pdb.set_trace()
     result=[]
     line={}
@@ -216,7 +222,10 @@ def output(outputDict):
         row=row+1
     book.save('result.xls')
     print('output to result.xls')
+    finish=time.time()
+    print("output:",finish-start)
 def compare(allFilesDict):
+    start=time.time()
     outputDict=dict.fromkeys(allFilesDict.keys())
     for ouputDict_key,ouputDict_value in outputDict.items():
         outputDict[ouputDict_key]=dict.fromkeys(allSheets.keys(),'')
@@ -256,6 +265,8 @@ def compare(allFilesDict):
                         if j==len(sameCellinEachFiledDict_value)-1:
                             break
                 break
+    finish=time.time()
+    print("compare:",finish-start)
     return outputDict
 
 #主函数
@@ -263,8 +274,6 @@ def main():
     #while True:
     choice='y'
     readfilesetting(choice)
-    finish=time.time()
-    print(finish-start)
 ##        try:
 ##            choice=input('''Compare excel files with setting.json or not(y or n):
 ##e to exit, h to help\r\n''')
@@ -290,6 +299,5 @@ def main():
 ##                    sys.exit()
 ##        except ValueError:
 ##            print('Please enter y or n or e')
-start=time.time()
 main()
 

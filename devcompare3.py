@@ -8,15 +8,19 @@ import time
 #读取文件名
 file={}
 def tupletodict(a):
+    start=time.time()
     bb=[]
     for item in a:
         b={}
         b[item]=''
         bb.append(b)
+    finish=time.time()
+    print('tupletodict：',finish-start)
     return bb
 
 #读取每个文件中的表名
 def sheetstodict(a,d):
+    start=time.time()
     aa=[]
     #pdb.set_trace()
     for iter in a:
@@ -29,7 +33,7 @@ def sheetstodict(a,d):
                     if dvalue!='':
                         for s in wb.sheets():
                             if s.name==dkey:
-                                c=readcelltodict(s,dvalue)
+                                c=readcelltodict(key,s,dvalue)
                                 shts[s.name]=c
                                 b[key]=shts
                                 dd=c.keys()
@@ -94,12 +98,25 @@ def sheetstodict(a,d):
             #                    pass
             #                else:
             #                    value1[key2]=''
+    finish=time.time()
+    print('sheetstodict：',finish-start)
     return aa   
 
-def readcelltodict(a,d=None):
+def readcelltodict(key,a,d=None):
+    start=time.time()
     b={}
+    xlsmaxrow=65536
+    xlsmaxcolumn=256
+    xlsxmaxrow=16384
+    xlsxmaxcolumn=1048576
+    if key[-1]=='s':
+        maxrow=xlsmaxrow
+        maxcolumn=xlsmaxcolumn
+    else:
+        maxrow=xlsxmaxrow
+        maxcolumn=xlsxmaxcolumn
     if d:
-        c=convertstrtonumber(d)
+        c=convertstrtonumber(d,maxrow,maxcolumn)
         rowstart=c[0][1]
         rowend=c[1][1]+1
         colstart=c[0][0]
@@ -115,9 +132,12 @@ def readcelltodict(a,d=None):
         for row in range(a.nrows):
             for col in range(a.ncols):
                 b[xlrd.cellname(row,col)]=a.cell(row,col).value
+    finish=time.time()
+    print('readcelltodict：',finish-start)
     return b
 
-def convertstrtonumber(a):
+def convertstrtonumber(a,maxrow,maxcolumn):
+    start=time.time()
     b=a.split(':')
     e=[]
     for cellloc in b:
@@ -125,19 +145,28 @@ def convertstrtonumber(a):
         c=re.match("^\w[A-Z]*",cellloc).group()
         c=c.upper()
         f=convertalphabettonumber(c)
-        g.append(f)
         d=re.search("\d[0-9]*",cellloc).group()
         d=int(d)-1
+        if f>maxrow:
+            f=maxrow
+        if d>maxcolumn:
+            d=maxcolumn
+        g.append(f)
         g.append(d)
         e.append(g)
+    finish=time.time()
+    print('convertstrtonumber：',finish-start)
     return e
 
 alphabet={'A':0,'B':1,'C':2,'D':3,'E':4,'F':5,'G':6,'H':7,'I':8,'J':9,'K':10,'L':11,'M':12,'N':13,'O':14,'P':15,'Q':16,'R':17,'S':18,'T':29,'U':20,'V':21,'W':22,'X':23,'Y':24,'Z':25}
 def convertalphabettonumber(a):
+    start=time.time()
     ll=len(a)
     s=0
     for i in range(0,ll):
         s=s+alphabet[a[i]]*(26**(ll-1-i))
+    finish=time.time()
+    print("convertalphabettonumber:",finish-start)
     return s
     
 def readfilesetting(a='n'):
@@ -158,6 +187,7 @@ def readfilesetting(a='n'):
     d=compare(c)
     output(d)
 def output(d):
+    start=time.time()
     #pdb.set_trace()
     for item in d: 
         str=''      
@@ -167,7 +197,10 @@ def output(d):
             else:
                 str=str+item[item2]
         print(str)
+    finish=time.time()
+    print('output：',finish-start)
 def compare(a):
+    start=time.time()
     notin=[]
     filename=[]
     filename.append('File Name')
@@ -258,6 +291,8 @@ def compare(a):
                 for ab in cell:
                     diff.append(ab)
                 notin.append(diff)
+    finish=time.time()
+    print('compare：',finish-start)
     return notin
 
 
@@ -265,8 +300,6 @@ def compare(a):
 def main():
     choice='y'
     readfilesetting(choice)
-    finish=time.time()
-    print(finish-start)
 ##    while True:
 ##        try:
 ##            a=input('''Load setting or not(y or n):
@@ -282,5 +315,4 @@ def main():
 ##                    sys.exit()
 ##        except ValueError:
 ##            print('Please enter y or n or e')
-start=time.time()
 main()
