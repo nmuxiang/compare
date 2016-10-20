@@ -178,8 +178,8 @@ def readfilesetting(choice='n'):
             print('open file error')
         except FileNotFoundError:
             print('can not find setting.json')
-    #readFile=tkinter.filedialog.askopenfilenames()
-    readFile=["1.xlsx","2.xlsx","3.xlsx"]
+    readFile=tkinter.filedialog.askopenfilenames()
+    #readFile=["1.xlsx","2.xlsx","3.xlsx"]
     excelFileDict=getexcelfiledict(readFile)
     allFileDict=getsheetsdict(excelFileDict,setting)
     outputDict=compare(allFileDict)
@@ -257,7 +257,7 @@ def compare(allFilesDict):
                         for iter in sameCellinEachFiledDict_value:
                             value=outputDict[iter[0]][allSheets_key]
                             if value!='':
-                                outputDict[iter[0]][allSheets_key]=value+';'+sameCellinEachFiledDict_key+'单元格:'+str(iter[1])
+                                outputDict[iter[0]][allSheets_key]=value+'\n'+sameCellinEachFiledDict_key+'单元格:'+str(iter[1])
                             else:
                                 outputDict[iter[0]][allSheets_key]=sameCellinEachFiledDict_key+'单元格:'+str(iter[1])
                         break
@@ -271,33 +271,33 @@ def compare(allFilesDict):
 
 #主函数
 def main():
-    #while True:
-    choice='y'
-    readfilesetting(choice)
-##        try:
-##            choice=input('''Compare excel files with setting.json or not(y or n):
-##e to exit, h to help\r\n''')
-##            if choice!='y' and choice!='Y' and choice!='n' and choice!='N' and choice!='e' and choice!='E' and choice!='h' and choice!='H':
-##                raise ValueError
-##            else:
-##                if choice=='y'or choice=='Y' or choice=='n' or choice=='N':
-##                    readfilesetting(choice)
-##                    finish=time.time()
-##                    print(finish-start)
-##                elif choice=='h' or choice=='H':
-##                    print('''Introduction
-##This program used to compare excel files.Out put the difference between mutli files.
-##===================================================================================
-##Paramaters
-##y   you can modify setting.json file,to specify sheets and cells you want to compare.
-##    So Before you input y, you must modify setting.json first.
-##n   you just select excel files,the program will compare each cell of each sheet of each file.
-##e   quit program.
-##h   help.
-##''')
-##                elif choice=='e' or choice=='E':
-##                    sys.exit()
-##        except ValueError:
-##            print('Please enter y or n or e')
+    while True:
+    #choice='y'
+    #readfilesetting(choice)
+        try:
+            choice=input('''Compare excel files with setting.json or not(y or n):
+e to exit, h to help\r\n''')
+            if choice!='y' and choice!='Y' and choice!='n' and choice!='N' and choice!='e' and choice!='E' and choice!='h' and choice!='H':
+                raise ValueError
+            else:
+                if choice=='y'or choice=='Y' or choice=='n' or choice=='N':
+                    readfilesetting(choice)
+                    #finish=time.time()
+                    #print(finish-start)
+                elif choice=='h' or choice=='H':
+                    print('''Introduction
+This program used to compare excel files.Out put the difference between mutli files.
+===================================================================================
+Paramaters
+y   you can modify setting.json file,to specify sheets and cells you want to compare.
+    So Before you input y, you must modify setting.json first.
+n   you just select excel files,the program will compare each cell of each sheet of each file.
+e   quit program.
+h   help.
+''')
+                elif choice=='e' or choice=='E':
+                    sys.exit()
+        except ValueError:
+            print('Please enter y or n or e')
 main()
 
