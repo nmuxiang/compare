@@ -225,6 +225,7 @@ def output(outputDict):
     finish=time.time()
     print("output:",finish-start)
 def compare(allFilesDict):
+    print(allFilesDict)
     start=time.time()
     outputDict=dict.fromkeys(allFilesDict.keys())
     for ouputDict_key,ouputDict_value in outputDict.items():
@@ -257,7 +258,7 @@ def compare(allFilesDict):
                         for iter in sameCellinEachFiledDict_value:
                             value=outputDict[iter[0]][allSheets_key]
                             if value!='':
-                                outputDict[iter[0]][allSheets_key]=value+'\n'+sameCellinEachFiledDict_key+'单元格:'+str(iter[1])
+                                outputDict[iter[0]][allSheets_key]=value+'\r\n'+sameCellinEachFiledDict_key+'单元格:'+str(iter[1])
                             else:
                                 outputDict[iter[0]][allSheets_key]=sameCellinEachFiledDict_key+'单元格:'+str(iter[1])
                         break
@@ -266,6 +267,7 @@ def compare(allFilesDict):
                             break
                 break
     finish=time.time()
+    print(outputDict)
     print("compare:",finish-start)
     return outputDict
 
