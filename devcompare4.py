@@ -6,7 +6,7 @@ import json
 import re
 import cProfile
 import time
-#import pdb
+import pdb
 
 #读取文件名
 allSheets={}
@@ -23,6 +23,7 @@ def getexcelfiledict(readFile):
 def getsheetsdict(excelFileDict,setting):
     start=time.time()
     allFilesDict={}
+    
     #excelfiledict从列表改为字典
     if setting:
         for key in excelFileDict.keys():
@@ -32,6 +33,7 @@ def getsheetsdict(excelFileDict,setting):
                 if setting_value!='':
                     for sheet in wb.sheets():
                         if sheet.name==setting_key:
+                            pdb.set_trace()
                             allCellsinOneSheet=readcelltodict(key,sheet,setting_value)
                             oneSheet[sheet.name]=allCellsinOneSheet
                             allCellsinOneSheet_keys=allCellsinOneSheet.keys()
