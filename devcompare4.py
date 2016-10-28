@@ -116,9 +116,9 @@ def readcelltodict(key,sheet,setting=None):
     if setting:
         zone=convertstrtonumber(setting,maxrow,maxcolumn)
         rowstart=zone['startRow']
-        rowend=zone['endColumn']+1
+        rowend=zone['endRow']+1
         colstart=zone['startColumn']
-        colend=zone['endRow']+1
+        colend=zone['endColumn']+1
         for row in range(rowstart,rowend):
             for col in range(colstart,colend):
                 try:
@@ -140,11 +140,11 @@ def convertstrtonumber(setting,maxrow,maxcolumn):
     cellRange=setting.split(':')
     zone={}
     for cellAdrress in cellRange:
-        rowAlphabet=re.match("^\w[A-Z]*",cellAdrress).group()
-        rowAlphabet=rowAlphabet.upper()
-        rowNumber=convertalphabettonumber(rowAlphabet)-1
-        colNumber=re.search("\d[0-9]*",cellAdrress).group()
-        colNumber=int(colNumber)-1
+        colAlphabet=re.match("^\w[A-Z]*",cellAdrress).group()
+        colAlphabet=colAlphabet.upper()
+        colNumber=convertalphabettonumber(colAlphabet)-1
+        rowNumber=re.search("\d[0-9]*",cellAdrress).group()
+        rowNumber=int(rowNumber)-1
         if rowNumber>maxrow:
             rowNumber=maxrow
         if colNumber>maxcolumn:
@@ -159,15 +159,15 @@ def convertstrtonumber(setting,maxrow,maxcolumn):
     print("convertstrtonumber:",finish-start)
     return zone
 alphabet={'A':1,'B':2,'C':3,'D':4,'E':5,'F':6,'G':7,'H':8,'I':9,'J':10,'K':11,'L':12,'M':13,'N':14,'O':15,'P':16,'Q':17,'R':18,'S':19,'T':20,'U':21,'V':22,'W':23,'X':24,'Y':25,'Z':26}
-def convertalphabettonumber(rowAlphabet):
+def convertalphabettonumber(colAlphabet):
     start=time.time()
-    length=len(rowAlphabet)
-    rowNumber=0
+    length=len(colAlphabet)
+    colNumber=0
     for i in range(0,length):
-        rowNumber=rowNumber+alphabet[rowAlphabet[i]]*(26**(length-i-1))
+        colNumber=colNumber+alphabet[colAlphabet[i]]*(26**(length-i-1))
     finish=time.time()
     print("convertalphabettonumber:",finish-start)
-    return rowNumber
+    return colNumber
     
 def readfilesetting(choice='n'):
     setting={}
