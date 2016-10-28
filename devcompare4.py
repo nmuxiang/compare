@@ -6,7 +6,7 @@ import json
 import re
 import cProfile
 import time
-import pdb
+#import pdb
 
 #读取文件名
 allSheets={}
@@ -23,7 +23,7 @@ def getexcelfiledict(readFile):
 def getsheetsdict(excelFileDict,setting):
     start=time.time()
     allFilesDict={}
-    
+    #pdb.set_trace()
     #excelfiledict从列表改为字典
     if setting:
         for key in excelFileDict.keys():
@@ -31,10 +31,10 @@ def getsheetsdict(excelFileDict,setting):
             oneSheet={}
             for setting_key,setting_value in setting.items():
                 if setting_value!='':
+                    zone=convertstrtonumber(key,setting_value)
                     for sheet in wb.sheets():
                         if sheet.name==setting_key:
-                            pdb.set_trace()
-                            allCellsinOneSheet=readcelltodict(key,sheet,setting_value)
+                            allCellsinOneSheet=readcelltodict(key,sheet,zone)
                             oneSheet[sheet.name]=allCellsinOneSheet
                             allCellsinOneSheet_keys=allCellsinOneSheet.keys()
                             allSheets[sheet.name]=dict.fromkeys(allCellsinOneSheet_keys,'')
@@ -42,7 +42,7 @@ def getsheetsdict(excelFileDict,setting):
                 else:
                     for sheet in wb.sheets():
                         if sheet.name==setting_key:
-                            allCellsinOneSheet=readcelltodict(sheet)
+                            allCellsinOneSheet=readcelltodict(key,sheet)
                             allCellsinOneSheet_keys=allCellsinOneSheet.keys()
                             try:
                                 allSheets_keys=allSheets[sheet.name].keys()
@@ -100,21 +100,10 @@ def getsheetsdict(excelFileDict,setting):
     print("getsheetsdict:",finish-start)
     return allFilesDict
 
-def readcelltodict(key,sheet,setting=None):
+def readcelltodict(key,sheet,zone=None):
     start=time.time()
     allCellsinOneSheet={}
-    xlsmaxrow=65536
-    xlsmaxcolumn=256
-    xlsxmaxrow=16384
-    xlsxmaxcolumn=1048576
-    if key[-1]=='s':
-        maxrow=xlsmaxrow
-        maxcolumn=xlsmaxcolumn
-    else:
-        maxrow=xlsxmaxrow
-        maxcolumn=xlsxmaxcolumn
-    if setting:
-        zone=convertstrtonumber(setting,maxrow,maxcolumn)
+    if zone:
         rowstart=zone['startRow']
         rowend=zone['endRow']+1
         colstart=zone['startColumn']
@@ -135,12 +124,23 @@ def readcelltodict(key,sheet,setting=None):
 
     return allCellsinOneSheet
 
-def convertstrtonumber(setting,maxrow,maxcolumn):
+def convertstrtonumber(key,setting_value):
     start=time.time()
-    cellRange=setting.split(':')
+    xlsmaxrow=65536
+    xlsmaxcolumn=256
+    xlsxmaxrow=16384
+    xlsxmaxcolumn=1048576
+    if key[-1]=='s' or key[-1]=='S':
+        maxrow=xlsmaxrow
+        maxcolumn=xlsmaxcolumn
+    else:
+        maxrow=xlsxmaxrow
+        maxcolumn=xlsxmaxcolumn
+    cellRange=setting_value.split(':')
     zone={}
     for cellAdrress in cellRange:
-        colAlphabet=re.match("^\w[A-Z]*",cellAdrress).group()
+        #pdb.set_trace()
+        colAlphabet=re.match("^\w[a-z,A-Z]*",cellAdrress).group()
         colAlphabet=colAlphabet.upper()
         colNumber=convertalphabettonumber(colAlphabet)-1
         rowNumber=re.search("\d[0-9]*",cellAdrress).group()
