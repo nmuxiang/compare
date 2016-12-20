@@ -221,6 +221,7 @@ def compare(allFilesDict):
                 if allSheets_value.keys():
                     for allSheets_value_key in allSheets_value.keys():
                         cell=[]
+                        #################
                         cell.append(allFilesDict_key)
                         cell.append(allFilesDict_value[allSheets_key][allSheets_value_key])
                         if allSheets_value_key in sameCellinEachFiledDict:
@@ -229,6 +230,7 @@ def compare(allFilesDict):
                             allFileCell=[]
                             allFileCell.append(cell)
                             sameCellinEachFiledDict[allSheets_value_key]=allFileCell
+                        #################
                 else:
                     outputDict[allFilesDict_key][allSheets_key]='Empty'
             else:
