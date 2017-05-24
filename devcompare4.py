@@ -73,7 +73,7 @@ def getsheetsdict(excelFileDict,setting):
             wb=xlrd.open_workbook(key)
             oneSheet={}
             for sheet in wb.sheets():
-                allCellsinOneSheet=readcelltodict(sheet)
+                allCellsinOneSheet=readcelltodict(key,sheet)
                 allCellsinOneSheet_keys=allCellsinOneSheet.keys()
                 try:
                     allSheets_keys=allSheets[sheet.name].keys()
@@ -212,7 +212,7 @@ def output(outputDict):
 def compare(allFilesDict):
     outputDict=dict.fromkeys(allFilesDict.keys())
     for ouputDict_key,ouputDict_value in outputDict.items():
-        outputDict[ouputDict_key]=dict.fromkeys(allSheets.keys(),'')
+        outputDict[ouputDict_key]=dict.fromkeys(allSheets.keys(),dict())
     for allSheets_key,allSheets_value in allSheets.items():          #allSheets_key表名，allSheets_value单元格字典
         temp={}
         sameCellinEachFiledDict={}
@@ -232,25 +232,28 @@ def compare(allFilesDict):
                             sameCellinEachFiledDict[allSheets_value_key]=allFileCell
                         #################
                 else:
-                    outputDict[allFilesDict_key][allSheets_key]='Empty'
+                    outputDict[allFilesDict_key][allSheets_key]['Empty']=''
             else:
-                outputDict[allFilesDict_key][allSheets_key]='None'
+                outputDict[allFilesDict_key][allSheets_key]['None']=''
 
         for sameCellinEachFiledDict_key,sameCellinEachFiledDict_value in sameCellinEachFiledDict.items():
             for i in range(0,len(sameCellinEachFiledDict_value)-1):
                 for j in range(i+1,len(sameCellinEachFiledDict_value)):
                     if sameCellinEachFiledDict_value[i][1]!=sameCellinEachFiledDict_value[j][1]:
                         for iter in sameCellinEachFiledDict_value:
-                            value=outputDict[iter[0]][allSheets_key]
-                            if value!='':
-                                outputDict[iter[0]][allSheets_key]=value+'\r\n'+sameCellinEachFiledDict_key+'单元格:'+str(iter[1])
-                            else:
-                                outputDict[iter[0]][allSheets_key]=sameCellinEachFiledDict_key+'单元格:'+str(iter[1])
+                            #value=outputDict[iter[0]][allSheets_key]
+                            outputDict[iter[0]][allSheets_key][sameCellinEachFiledDict_key]=iter[1]
+                            #if value!='':
+                            #    outputDict[iter[0]][allSheets_key]=value+'\r\n'+sameCellinEachFiledDict_key+'单元格:'+str(iter[1])
+                            #else:
+                            #    outputDict[iter[0]][allSheets_key]=sameCellinEachFiledDict_key+'单元格:'+str(iter[1])
+                            sorted(outputDict[iter[0][allSheets_key]].items(),key=lambda item:item[0])
                         break
                     else:
                         if j==len(sameCellinEachFiledDict_value)-1:
                             break
                 break
+    #outputDict=sorted(outputDict.items(),key=lambda d:d[0],reverse=False)
     return outputDict
 
 #主函数
