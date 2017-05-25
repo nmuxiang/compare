@@ -6,6 +6,7 @@ import json
 import re
 import cProfile
 import time
+from operator import itemgetter
 #import pdb
 
 #all sheets aggregation of excel files
@@ -172,6 +173,15 @@ def readfilesetting(choice='n'):
     allFileDict=getsheetsdict(excelFileDict,setting)
     outputDict=compare(allFileDict)
     output(outputDict)
+
+def convertlisttostr(value):
+    temp=''
+    for element in value:
+        if isinstance(element,str)==False:
+            temp=temp+element[0]+'单元格'+str(element[1])+'\r\n'
+        else:
+            temp=element
+    return temp
 def output(outputDict):
     result=[]
     line={}
@@ -186,9 +196,10 @@ def output(outputDict):
         for line_key,line_value in line.items():
             if line_value!='':
                 tempstr=line_value
-                line[line_key]=tempstr+SEPARATE+outputDict_value[line_key]
+                line[line_key]=tempstr+SEPARATE+convertlisttostr(outputDict_value[line_key])
             else:
-                line[line_key]=outputDict_value[line_key]
+                tempstr=convertlisttostr(outputDict_value[line_key])
+                line[line_key]=tempstr
     book=Workbook()
     sheet1=book.add_sheet('Sheet1')
     headLineStrlist=headLineStr.split(',')
@@ -207,12 +218,12 @@ def output(outputDict):
             sheet1.write(row,col,tempstrlist_iter)
         row=row+1
     book.save('result.xls')
-    print("output:",finish-start)
+    print("output to result.xls")
 
 def compare(allFilesDict):
     outputDict=dict.fromkeys(allFilesDict.keys())
     for ouputDict_key,ouputDict_value in outputDict.items():
-        outputDict[ouputDict_key]=dict.fromkeys(allSheets.keys(),dict())
+        outputDict[ouputDict_key]=dict.fromkeys(allSheets.keys(),{})
     for allSheets_key,allSheets_value in allSheets.items():          #allSheets_key表名，allSheets_value单元格字典
         temp={}
         sameCellinEachFiledDict={}
@@ -232,9 +243,13 @@ def compare(allFilesDict):
                             sameCellinEachFiledDict[allSheets_value_key]=allFileCell
                         #################
                 else:
-                    outputDict[allFilesDict_key][allSheets_key]['Empty']=''
+                    temp={}
+                    temp['Empty']=''
+                    outputDict[allFilesDict_key][allSheets_key]=temp
             else:
-                outputDict[allFilesDict_key][allSheets_key]['None']=''
+                temp={}
+                temp['None']=''
+                outputDict[allFilesDict_key][allSheets_key]=temp
 
         for sameCellinEachFiledDict_key,sameCellinEachFiledDict_value in sameCellinEachFiledDict.items():
             for i in range(0,len(sameCellinEachFiledDict_value)-1):
@@ -242,12 +257,15 @@ def compare(allFilesDict):
                     if sameCellinEachFiledDict_value[i][1]!=sameCellinEachFiledDict_value[j][1]:
                         for iter in sameCellinEachFiledDict_value:
                             #value=outputDict[iter[0]][allSheets_key]
-                            outputDict[iter[0]][allSheets_key][sameCellinEachFiledDict_key]=iter[1]
+                            temp[sameCellinEachFiledDict_key]=iter[1]
+                            #outputDict[iter[0]][allSheets_key]=temp
                             #if value!='':
                             #    outputDict[iter[0]][allSheets_key]=value+'\r\n'+sameCellinEachFiledDict_key+'单元格:'+str(iter[1])
                             #else:
                             #    outputDict[iter[0]][allSheets_key]=sameCellinEachFiledDict_key+'单元格:'+str(iter[1])
-                            sorted(outputDict[iter[0][allSheets_key]].items(),key=lambda item:item[0])
+                            #temp=outputDict[iter[0]][allSheets_key]
+                            outputlist=sorted(temp.items(),key=itemgetter(0))
+                            outputDict[iter[0]][allSheets_key]=outputlist
                         break
                     else:
                         if j==len(sameCellinEachFiledDict_value)-1:
