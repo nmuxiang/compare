@@ -256,16 +256,18 @@ def compare(allFilesDict):
                 for j in range(i+1,len(sameCellinEachFiledDict_value)):
                     if sameCellinEachFiledDict_value[i][1]!=sameCellinEachFiledDict_value[j][1]:
                         for iter in sameCellinEachFiledDict_value:
+                            temp={}
                             #value=outputDict[iter[0]][allSheets_key]
                             temp[sameCellinEachFiledDict_key]=iter[1]
-                            #outputDict[iter[0]][allSheets_key]=temp
-                            #if value!='':
-                            #    outputDict[iter[0]][allSheets_key]=value+'\r\n'+sameCellinEachFiledDict_key+'单元格:'+str(iter[1])
-                            #else:
-                            #    outputDict[iter[0]][allSheets_key]=sameCellinEachFiledDict_key+'单元格:'+str(iter[1])
-                            #temp=outputDict[iter[0]][allSheets_key]
-                            outputlist=sorted(temp.items(),key=itemgetter(0))
-                            outputDict[iter[0]][allSheets_key]=outputlist
+                            tempsort=outputDict[iter[0]][allSheets_key]
+                            if tempsort!={}:
+                                temp=sorted(temp.items(),key=itemgetter(0))
+                                tempsort.extend(temp)
+                                outputlist=sorted(tempsort,key=itemgetter(0))
+                                outputDict[iter[0]][allSheets_key]=outputlist
+                            else:
+                                outputlist=sorted(temp.items(),key=itemgetter(0))
+                                outputDict[iter[0]][allSheets_key]=outputlist
                         break
                     else:
                         if j==len(sameCellinEachFiledDict_value)-1:
