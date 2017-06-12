@@ -6,8 +6,7 @@ import json
 import re
 import cProfile
 import time
-from operator import itemgetter
-#import pdb
+import collections
 
 #all sheets aggregation of excel files
 allSheets={}
@@ -222,14 +221,15 @@ def output(outputDict):
         row=row+1
         colsheet=col+1
         for line_value_key,line_value_value in line_value.items():
-            if line_value_key=='None' or 'Empty':
+            if line_value_key=='NoneorEmpty':
                 col=colsheet+1
             else:
                 col=colsheet
                 sheet1.write(row,col,line_value_key)
-        #    for iter in line_value_value:
-        #        sheet1.write(row,col,iter)
-        #        col=col+1
+                col=col+1
+            for iter in line_value_value:
+                sheet1.write(row,col,iter)
+                col=col+1
             row=row+1
     book.save('result.xls')
     print("output to result.xls")
@@ -258,11 +258,11 @@ def compare(allFilesDict):
                         #################
                 else:
                     temp={}
-                    temp['Empty']=['Empty']
+                    temp['NoneorEmpty']=['Empty']
                     outputDict[allFilesDict_key][allSheets_key]=temp
             else:
                 temp={}
-                temp['None']=['None']
+                temp['NoneorEmpty']=['None']
                 outputDict[allFilesDict_key][allSheets_key]=temp
 
         for sameCellinEachFiledDict_key,sameCellinEachFiledDict_value in sameCellinEachFiledDict.items():
@@ -270,22 +270,17 @@ def compare(allFilesDict):
                 for j in range(i+1,len(sameCellinEachFiledDict_value)):
                     if sameCellinEachFiledDict_value[i][1]!=sameCellinEachFiledDict_value[j][1]:
                         for iter in sameCellinEachFiledDict_value:
-                            temp={}
+                            temp=collections.OrderedDict()
                             templist=[]
                             templist.append(iter[1])
                             temp[sameCellinEachFiledDict_key]=templist
-                            #value=outputDict[iter[0]][allSheets_key]
-                            #temp[sameCellinEachFiledDict_key]=iter[1]
                             tempoutput=outputDict[iter[0]][allSheets_key]
                             if tempoutput!={}:
-                               # if sameCellinEachFiledDict_key in tempoutput:
-                               #     tempoutput.extend(templist)
-                               #     outputDict[iter[0]][allSheets_key]=tempoutput
-                               # else:
                                templist=[]
                                templist.append(iter[1])
                                temp[sameCellinEachFiledDict_key]=templist
                                tempoutput[sameCellinEachFiledDict_key]=templist
+                               tempoutput=collections.OrderedDict(sorted(tempoutput.items(),key=lambda t:t[0]))
                                outputDict[iter[0]][allSheets_key]=tempoutput
                             else:
                                 outputDict[iter[0]][allSheets_key]=temp
