@@ -174,32 +174,39 @@ def readfilesetting(choice='n'):
     outputDict=compare(allFileDict)
     output(outputDict)
 
-def convertlisttostr(value):
-    temp=''
-    for element in value:
-        if isinstance(element,str)==False:
-            temp=temp+element[0]+'单元格'+str(element[1])+'\r\n'
-        else:
-            temp=element
-    return temp
+#def convertlisttolist(value,SEPARATE):
+#    temp=[]
+#    for element in value:
+#        if isinstance(element,str)==False:
+#            tempdict={}
+#            tempdict[element[0]]=element[1]
+#            temp.append(tempdict)
+#        else:
+#            temp.append(element)
+#    return temp
 def output(outputDict):
     result=[]
     line={}
-    headLineStr='FileName'
     SEPARATE=','
+    headLineStr='Sheet'+SEPARATE+'Cell'
     for outputDict_key,outputDict_value in outputDict.items():
         headLineStr=headLineStr+ SEPARATE + outputDict_key
         if line:
             pass
         else:
             line=dict.fromkeys(outputDict_value.keys(),'')
-        for line_key,line_value in line.items():
-            if line_value!='':
-                tempstr=line_value
-                line[line_key]=tempstr+SEPARATE+convertlisttostr(outputDict_value[line_key])
+        for outputDict_value_key,outputDict_value_value in outputDict_value.items():
+            if line[outputDict_value_key]!='':
+                for outputDict_value_value_key,outputDict_value_value_value in outputDict_value_value.items():
+                    if outputDict_value_value_key in line[outputDict_value_key]:
+                        temp=[]
+                        temp= line[outputDict_value_key][outputDict_value_value_key]
+                        temp.extend(outputDict_value_value_value)
+                        line[outputDict_value_key][outputDict_value_value_key]=temp
+                    else:
+                        line[outputDict_value_key][outputDict_value_value_key]=outputDict_value_value_value
             else:
-                tempstr=convertlisttostr(outputDict_value[line_key])
-                line[line_key]=tempstr
+                line[outputDict_value_key]=outputDict_value_value
     book=Workbook()
     sheet1=book.add_sheet('Sheet1')
     headLineStrlist=headLineStr.split(',')
@@ -211,12 +218,19 @@ def output(outputDict):
     row=row+1
     for line_key,line_value in line.items():
         col=0
-        tempstrlist=line_value.split(',')
         sheet1.write(row,col,line_key)
-        for tempstrlist_iter in tempstrlist:
-            col=col+1
-            sheet1.write(row,col,tempstrlist_iter)
         row=row+1
+        colsheet=col+1
+        for line_value_key,line_value_value in line_value.items():
+            if line_value_key=='None' or 'Empty':
+                col=colsheet+1
+            else:
+                col=colsheet
+                sheet1.write(row,col,line_value_key)
+        #    for iter in line_value_value:
+        #        sheet1.write(row,col,iter)
+        #        col=col+1
+            row=row+1
     book.save('result.xls')
     print("output to result.xls")
 
@@ -244,11 +258,11 @@ def compare(allFilesDict):
                         #################
                 else:
                     temp={}
-                    temp['Empty']=''
+                    temp['Empty']=['Empty']
                     outputDict[allFilesDict_key][allSheets_key]=temp
             else:
                 temp={}
-                temp['None']=''
+                temp['None']=['None']
                 outputDict[allFilesDict_key][allSheets_key]=temp
 
         for sameCellinEachFiledDict_key,sameCellinEachFiledDict_value in sameCellinEachFiledDict.items():
@@ -257,17 +271,24 @@ def compare(allFilesDict):
                     if sameCellinEachFiledDict_value[i][1]!=sameCellinEachFiledDict_value[j][1]:
                         for iter in sameCellinEachFiledDict_value:
                             temp={}
+                            templist=[]
+                            templist.append(iter[1])
+                            temp[sameCellinEachFiledDict_key]=templist
                             #value=outputDict[iter[0]][allSheets_key]
-                            temp[sameCellinEachFiledDict_key]=iter[1]
-                            tempsort=outputDict[iter[0]][allSheets_key]
-                            if tempsort!={}:
-                                temp=sorted(temp.items(),key=itemgetter(0))
-                                tempsort.extend(temp)
-                                outputlist=sorted(tempsort,key=itemgetter(0))
-                                outputDict[iter[0]][allSheets_key]=outputlist
+                            #temp[sameCellinEachFiledDict_key]=iter[1]
+                            tempoutput=outputDict[iter[0]][allSheets_key]
+                            if tempoutput!={}:
+                               # if sameCellinEachFiledDict_key in tempoutput:
+                               #     tempoutput.extend(templist)
+                               #     outputDict[iter[0]][allSheets_key]=tempoutput
+                               # else:
+                               templist=[]
+                               templist.append(iter[1])
+                               temp[sameCellinEachFiledDict_key]=templist
+                               tempoutput[sameCellinEachFiledDict_key]=templist
+                               outputDict[iter[0]][allSheets_key]=tempoutput
                             else:
-                                outputlist=sorted(temp.items(),key=itemgetter(0))
-                                outputDict[iter[0]][allSheets_key]=outputlist
+                                outputDict[iter[0]][allSheets_key]=temp
                         break
                     else:
                         if j==len(sameCellinEachFiledDict_value)-1:
