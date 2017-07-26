@@ -2,7 +2,6 @@ import tkinter.filedialog
 import xlrd
 from xlwt import Workbook
 import sys
-import json
 import re
 import cProfile
 import time
@@ -155,34 +154,43 @@ def convertalphabettonumber(colAlphabet):
         colNumber=colNumber+alphabet[colAlphabet[i]]*(26**(length-i-1))
     return colNumber
     
+def settingtojson(settingtext):
+    sheetcellsdict={}
+    for setting_element in settingtext:
+        if "," in setting_element:
+            pass
+        elif ":" not in setting_element:
+            pass
+        elif
+            if setting_element[-1:]=='\n':
+                setting_element=setting_element[:-1]
+            else:
+                pass
+            sheetandcells=setting_element.split(',')
+            sheet=sheetandcells[0]
+            cells=sheetandcells[1]
+            sheetcellsdict[sheet]=cells
+            print("Format error. Please check setting.txt")   
+    setting=sheetcellsdict
+    return setting
 def readfilesetting(choice='n'):
     setting={}
     if choice=='y':
         try:
-            settingFile=open('setting.json','r')
-            #pdb.set_trace()
-            setting=json.load(settingFile)
+            settingFile=open('setting.txt','r')
+            settingtext=settingFile.readlines()
+            setting=settingtojson(settingtext)
+            #setting=json.load(setting)
         except IOError:
             print('open file error')
         except FileNotFoundError:
             print('can not find setting.json')
     readFile=tkinter.filedialog.askopenfilenames()
-    #readFile=["1.xlsx","2.xlsx","3.xlsx"]
     excelFileDict=getexcelfiledict(readFile)
     allFileDict=getsheetsdict(excelFileDict,setting)
     outputDict=compare(allFileDict)
     output(outputDict)
 
-#def convertlisttolist(value,SEPARATE):
-#    temp=[]
-#    for element in value:
-#        if isinstance(element,str)==False:
-#            tempdict={}
-#            tempdict[element[0]]=element[1]
-#            temp.append(tempdict)
-#        else:
-#            temp.append(element)
-#    return temp
 def output(outputDict):
     result=[]
     line={}
@@ -295,8 +303,6 @@ def compare(allFilesDict):
 #主函数
 def main():
     while True:
-    #choice='y'
-    #readfilesetting(choice)
         try:
             choice=input('''Compare excel files with setting.json or not(y or n):
 e to exit, h to help\r\n''')
@@ -305,8 +311,6 @@ e to exit, h to help\r\n''')
             else:
                 if choice=='y'or choice=='Y' or choice=='n' or choice=='N':
                     readfilesetting(choice)
-                    #finish=time.time()
-                    #print(finish-start)
                 elif choice=='h' or choice=='H':
                     print('''Introduction
 This program used to compare excel files.Out put the difference between mutli files.
