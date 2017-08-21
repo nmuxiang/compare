@@ -6,7 +6,7 @@ import re
 import cProfile
 import time
 import collections
-
+import string
 #all sheets aggregation of excel files
 allSheets={}
 
@@ -246,6 +246,22 @@ def output(outputDict):
     book.save('result.xls')
     print("output to result.xls")
 
+
+def sort(tempoutput):
+    cellslist=tempoutput.keys()
+    sortlist=[]
+    for iter in cellslist:
+        colAlphabet=re.match("^\w[a-z,A-Z]*",iter).group()
+        rowNumber=int(re.search("\d[0-9]*",iter).group())
+        tup=(colAlphabet,rowNumber)
+        sortlist.append(tup)
+    sortlist.sort(key=lambda x:(x[0],x[1]))
+    sorteddict=collections.OrderedDict()
+    for iter in sortlist:
+        strkey=iter[0]+str(iter[1])
+        sorteddict[strkey]=tempoutput[strkey]
+    return sorteddict
+
 def compare(allFilesDict):
     outputDict=dict.fromkeys(allFilesDict.keys())
     for ouputDict_key,ouputDict_value in outputDict.items():
@@ -292,7 +308,8 @@ def compare(allFilesDict):
                                templist.append(iter[1])
                                temp[sameCellinEachFiledDict_key]=templist
                                tempoutput[sameCellinEachFiledDict_key]=templist
-                               tempoutput=collections.OrderedDict(sorted(tempoutput.items(),key=lambda t:t[0]))
+                               ##############################################################
+                               tempoutput=sort(tempoutput)
                                outputDict[iter[0]][allSheets_key]=tempoutput
                             else:
                                 outputDict[iter[0]][allSheets_key]=temp
