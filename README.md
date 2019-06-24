@@ -1,8 +1,8 @@
 # Compare Excel files
 ===================================================================================
-This program is used to compare excel files.Out put the difference between mutli files.
+This program is used to compare excel files.Out put the difference between multiple files.
 
-##Paramaters
+## Paramaters
 
 
 y      &emsp;you can modify setting.json file,to specify sheets and cells you want to compare.So Before you input y, you must modify   
